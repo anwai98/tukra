@@ -13,7 +13,8 @@ MODEL_CHOICES = [
     "cyto3",
     "livecell",
     "tissuenet",
-    "nuclei"
+    "nuclei",
+    "livecell_cp3",
 ]
 
 RESTORATION_CHOICES = [
@@ -22,7 +23,7 @@ RESTORATION_CHOICES = [
     "upsample_cyto3",
     "denoise_nuclei",
     "deblur_nuclei",
-    "upsample_nuclei"
+    "upsample_nuclei",
 ]
 
 
@@ -30,7 +31,7 @@ def segment_using_cellpose(
     image: np.ndarray,
     model_choice: str,
     restoration_choice: Optional[str] = None,
-    channels: List[int, int] = [0, 0],
+    channels: List[int] = [0, 0],
     diameter: Optional[int] = None,
 ):
     """Supports CellPose models.
@@ -41,20 +42,23 @@ def segment_using_cellpose(
         channels: TODO
         diameter: TODO
     """
-    assert model_choice in MODEL_CHOICES, f"{model_choice} is not supported in 'tukra'."
-
     use_gpu = torch.cuda.is_available()
 
     if restoration_choice is None:
-        if model_choice in ["cyto", "cyto2", "cyto3", "nuclei"]:  # specialist models
-            model = models.Cellpose(gpu=True, model_type=model_choice)
-            diameter = 30  # the default choice
-        else:  # generalist models
-            model = models.CellposeModel(gpu=use_gpu, model_type=model_choice)
+        if model_choice in ["cyto", "cyto2", "cyto3", "nuclei"]:  # generalist models
+            model = models.Cellpose(gpu=use_gpu, model_type=model_choice)
 
-        masks, flows, styles, diams = model.eval(
-            image, diameter=diameter, channels=channels,
-        )
+            if diameter is None:
+                diameter = 30  # the default choice
+
+            masks, flows, styles, diams = model.eval(image, diameter=diameter, channels=channels)
+
+        elif model_choice in ["livecell", "livecell_cp3", "tissuenet"]:  # specialist models
+            model = models.CellposeModel(gpu=use_gpu, model_type=model_choice)
+            masks, flows, styles = model.eval(image, diameter=diameter, channels=channels)
+
+        else:
+            raise ValueError(f"{model_choice} is not supported in 'tukra'.")
 
     else:
         assert restoration_choice in RESTORATION_CHOICES, f"{restoration_choice} is not supported in 'tukra'."

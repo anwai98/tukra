@@ -1,7 +1,6 @@
 from typing import List
 
 import numpy as np
-import pandas as pd
 
 from elf.evaluation import mean_segmentation_accuracy
 
@@ -19,28 +18,23 @@ def evaluate_predictions(
     if isinstance(metrics, str):
         metrics = [metrics]
 
-    results = []
+    results = {}
     for metric in metrics:
-        assert metric in SUPPORTED_EVALS
+        results[metric] = evaluate_sample(prediction, ground_truth, metric.lower())
 
-        results.append(
-            pd.DataFrame.from_dict(
-                {"metric": metric, "score": evaluate_sample(prediction, ground_truth, metric.lower())}
-            )
-        )
-
-    results = pd.concat(results, ignore_index=True)
     return results
 
 
 def evaluate_sample(prediction, ground_truth, metric):
+    assert metric in SUPPORTED_EVALS
+
     if metric == "msa" or metric.startswith("sa"):
         msa, sa = mean_segmentation_accuracy(prediction, ground_truth, return_accuracies=True)
 
         if metric == "msa":
             score = msa
         else:
-            values = list(np.range(50, 100, 5))
-            score = sa[values.index(int(metric[:2]))]
+            values = list(np.arange(50, 100, 5))
+            score = sa[values.index(int(metric[2:]))]
 
     return score
