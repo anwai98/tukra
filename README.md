@@ -1,5 +1,5 @@
 # tukra
-Convenience scripts for evaluating deep learning-based methods for biomedical image segmentation
+Convenience scripts for evaluating popular deep learning-based methods for biomedical image segmentation
 
 ## Supported Models:
 - CellPose
