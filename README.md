@@ -6,5 +6,16 @@ Convenience scripts for evaluating popular deep learning-based methods for biome
 - CellPose 2
 - CellPose 3
 
+### TODO:
+- StarDist
+- SplineDist
+- OmniPose
+
 ## Supported Datasets:
 - LIVECell
+
+### TODO:
+- PlantSeg
+- DeepBacs
+- DSB
+- Covid IF
