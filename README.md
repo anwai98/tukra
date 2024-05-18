@@ -10,12 +10,14 @@ Convenience scripts for evaluating popular deep learning-based methods for biome
 - StarDist
 - SplineDist
 - OmniPose
+- nnUNet (support for instance segmentation)
 
 ## Supported Datasets:
 - LIVECell
 
 ### TODO:
 - PlantSeg
+- MouseEmbryo
 - DeepBacs
 - DSB
 - Covid IF
