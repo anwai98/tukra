@@ -3,7 +3,10 @@ import os
 
 def _all_imageio_formats():
     import imageio
-    all_formats = [imageio.formats[f"{fmt.name}"].extensions for fmt in imageio.formats]
+    all_formats = []
+    for fmt in imageio.formats:
+        all_formats.extend(imageio.formats[f"{fmt.name}"].extensions)
+
     return all_formats
 
 
