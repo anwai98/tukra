@@ -28,6 +28,11 @@ def read_image(input_path, return_original_manifest=False):
         inputs = sitk.ReadImage(input_path)
         input_array = sitk.GetArrayFromImage(inputs)
 
+    elif extension == ".dcm":
+        import pydicom as dicom
+        inputs = dicom.dcmread(input_path)
+        input_array = inputs.pixel_array
+
     elif extension in _all_imageio_formats():
         import imageio.v3 as imageio
         inputs = imageio.imread(input_path)
