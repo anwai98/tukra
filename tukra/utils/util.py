@@ -11,6 +11,9 @@ def _all_imageio_formats():
 
 
 def read_image(input_path, return_original_manifest=False):
+    """Function to read popular biomedical imaging formats.
+    Returns numpy arrays for each supported formats.
+    """
     assert os.path.exists(input_path)
 
     extension = os.path.splitext(input_path)[-1]
