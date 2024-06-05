@@ -23,7 +23,7 @@ def read_image(
     extension = input_path.split(os.extsep, 1)[-1]
     extension = f".{extension}"
 
-    if extension == ".nii" or extension == ".nii.gz":
+    if extension in [".nii", ".nii.gz"]:
         import nibabel as nib
         inputs = nib.load(input_path)
         input_array = inputs.get_fdata()
@@ -38,7 +38,7 @@ def read_image(
         inputs = dicom.dcmread(input_path)
         input_array = inputs.pixel_array
 
-    elif extension == ".nrrd":
+    elif extension in [".nrrd", ".seg.nrrd"]:
         import nrrd
         input_array, header = nrrd.read(input_path)
         inputs = input_array
