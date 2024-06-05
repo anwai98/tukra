@@ -1,4 +1,5 @@
 import os
+from typing import Union
 
 
 def _all_imageio_formats():
@@ -10,13 +11,17 @@ def _all_imageio_formats():
     return all_formats
 
 
-def read_image(input_path, return_original_manifest=False):
+def read_image(
+    input_path: Union[os.PathLike, str],
+    return_original_manifest: bool = False
+):
     """Function to read popular biomedical imaging formats.
     Returns numpy arrays for each supported formats.
     """
     assert os.path.exists(input_path)
 
-    extension = os.path.splitext(input_path)[-1]
+    extension = input_path.split(os.extsep, 1)[-1]
+    extension = f".{extension}"
 
     if extension == ".nii" or extension == ".nii.gz":
         import nibabel as nib
