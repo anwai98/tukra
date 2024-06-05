@@ -33,6 +33,11 @@ def read_image(input_path, return_original_manifest=False):
         inputs = dicom.dcmread(input_path)
         input_array = inputs.pixel_array
 
+    elif extension == ".nrrd":
+        import nrrd
+        input_array, header = nrrd.read(input_path)
+        inputs = input_array
+
     elif extension in _all_imageio_formats():
         import imageio.v3 as imageio
         inputs = imageio.imread(input_path)
