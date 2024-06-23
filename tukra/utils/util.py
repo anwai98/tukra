@@ -13,6 +13,7 @@ def _all_imageio_formats():
 
 def read_image(
     input_path: Union[os.PathLike, str],
+    extension: Union[str],
     return_original_manifest: bool = False
 ):
     """Function to read popular biomedical imaging formats.
@@ -20,8 +21,8 @@ def read_image(
     """
     assert os.path.exists(input_path)
 
-    extension = input_path.split(os.extsep, 1)[-1]
-    extension = f".{extension}"
+    if extension[0] != ".":
+        extension = f".{extension}"
 
     if extension in [".nii", ".nii.gz"]:
         import nibabel as nib
