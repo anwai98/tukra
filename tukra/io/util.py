@@ -16,8 +16,20 @@ def read_image(
     extension: Union[str],
     return_original_manifest: bool = False
 ):
-    """Function to read popular biomedical imaging formats.
-    Returns numpy arrays for each supported formats.
+    """Function to read most popular biomedical imaging formats.
+    Current supported formats:
+        - nifti format (.nii, .nii.gz)
+        - dicom format (.dcm)
+        - metaimage header format (.mha)
+        - nearly raw raster data format (.nrrd, .seg.nrrd)
+        - all imageio-supported formats
+
+    Args:
+        input_path: The path to the input data.
+        extension: The extension of the input data
+        return_original_manifest: Returns the original data manifest.
+
+    Returns the numpy array for each supported formats.
     """
     assert os.path.exists(input_path)
 
