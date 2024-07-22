@@ -12,17 +12,14 @@ def main():
         path="/scratch/share/cidas/cca/data/orgasegment_cp", split="val", download=False,
     )
 
-    checkpoint_path, tmp = run_cellpose2_finetuning(
+    checkpoint_path, _ = run_cellpose2_finetuning(
         train_image_files=train_image_paths,
         train_label_files=train_gt_paths,
         val_image_files=val_image_paths,
         val_label_files=val_gt_paths,
-        n_epochs=10,
     )
 
     print(f"The model has been stored at '{checkpoint_path}'")
-
-    breakpoint()
 
 
 if __name__ == "__main__":
