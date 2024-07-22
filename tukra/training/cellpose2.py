@@ -92,7 +92,9 @@ def run_cellpose2_finetuning(
     # Let's define the CellPose model (without size model)
     model = models.CellposeModel(gpu=use_GPU, model_type=initial_model)
 
-    new_model_path = train.train_seg(
+    os.makedirs(save_root, exist_ok=True)
+
+    model_path = train.train_seg(
         net=model.net,
         train_files=train_image_files,
         train_labels_files=train_label_files,
@@ -113,4 +115,4 @@ def run_cellpose2_finetuning(
     # Diameter of labels in the training images (useful for evaluation)
     diam_labels = model.net.diam_labels.item()
 
-    return new_model_path, diam_labels
+    return model_path, diam_labels
