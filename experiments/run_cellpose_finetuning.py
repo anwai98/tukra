@@ -1,6 +1,8 @@
 # Results on OrgaSegment test set:
-# "cyto2": {'mSA': 0.29339636853771456, 'sa50': 0.473194573783817, 'sa75': 0.3060913601942939}
-# finetuned "cyto2":
+# "cyto2":
+#     - {'mSA': 0.29339636853771456, 'sa50': 0.473194573783817, 'sa75': 0.3060913601942939}
+# finetuned "cyto2": (finetuned for 10 epochs)
+#     - {'mSA': 0.4665593471680653, 'sa50': 0.7034327837020484, 'sa75': 0.5100150917921741}
 
 
 from tqdm import tqdm
