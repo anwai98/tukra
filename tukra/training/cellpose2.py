@@ -9,7 +9,7 @@ def run_cellpose2_finetuning(
     train_label_files: List[Union[os.PathLike, str]],
     val_image_files: List[Union[os.PathLike, str]],
     val_label_files: List[Union[os.PathLike, str]],
-    model_name: Optional[str] = None,
+    checkpoint_name: Optional[str] = None,
     save_root: Optional[Union[os.PathLike, str]] = None,
     initial_model: str = "cyto2",
     n_epochs: int = 100,
@@ -37,14 +37,17 @@ def run_cellpose2_finetuning(
         val_image_files (List[os.PathLike, str]): List of paths of the training image files.
         val_label_files (List[os.PathLike, str]): List of paths of the training image files.
         save_root (str, os.PathLike): Where to save the trained model.
-        model_name (str, None): The name of model with which it will be saved.
+        checkpoint_name (str, None): The name of model checkpoint with which it will be saved.
         initial_model (str): The pretrained model to initialize CellPose with for finetuning (or, train from scratch).
         n_epochs (int): The total number of epochs for training.
         channels_to_use_for_training (str): The first channel to be used for training.
         second_training_channel (str): The second channel to be used for training.
-        learning_rate (float): The learning rate fro training.
+        learning_rate (float): The learning rate for training.
+        momentum (float): The momentum for the optimizer.
         weight_decay (float): The weight decay for the optimizer.
         batch_size: The number of patches to batch together per iteration.
+        optimizer_choice (str): The choice of optimizer. Either "AdamW" (default) or "SGD".
+        kwargs: The additional parameters for the `cellpose.train.tran_seg` functionality.
 
     Returns:
         diam_labels: The diameter of objects in labels in the training set.
@@ -102,7 +105,7 @@ def run_cellpose2_finetuning(
         weight_decay=weight_decay,
         SGD=(optimizer_choice == "SGD"),
         batch_size=batch_size,
-        model_name=model_name,
+        model_name=checkpoint_name,
         momentum=momentum,
         **kwargs
     )

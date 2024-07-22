@@ -17,6 +17,8 @@ def main():
         train_label_files=train_gt_paths,
         val_image_files=val_image_paths,
         val_label_files=val_gt_paths,
+        save_root="/scratch/share/cidas/cca/test/cellpose_finetuning/",
+        checkpoint_name="finetune_cyto2_orgasegment",
     )
 
     print(f"The model has been stored at '{checkpoint_path}'")
