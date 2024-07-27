@@ -3,7 +3,7 @@ channels:
     - nvidia
     - conda-forge
 name:
-    tukra
+    tukra-cellpose
 dependencies:
     - affogato
     - zarr
@@ -17,5 +17,6 @@ dependencies:
     - tensorboard
     - torchvision
     - kornia
+    - pip
     - pip:
         - cellpose
