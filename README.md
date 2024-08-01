@@ -4,11 +4,17 @@ Welcome to `tukra`.
 
 This is a library composed of convenience scripts for evaluating (and training) popular deep learning-based methods for biomedical image segmentation.
 
+## Installation:
+- TODO
+    - CellPose: works out of the box
+    - StarDist: training works only for CPU - need to investigate GPU-supported tensorflow installation.
+
 ## Supported Models:
 
 ### Training (and Finetuning):
 - CellPose
 - CellPose 2
+- StarDist
 
 ### Inference:
 - CellPose
@@ -17,7 +23,6 @@ This is a library composed of convenience scripts for evaluating (and training) 
 
 ## TODO: Planned Frameworks
 - nnUNet (support for instance segmentation)
-- StarDist
 - SplineDist
 - OmniPose
 
@@ -25,6 +30,7 @@ This is a library composed of convenience scripts for evaluating (and training) 
 > Thanks to <a href="https://github.com/constantinpape/torch-em">`torch-em`</a>
 - LIVECell
 - OrgaSegment
+- DSB
 
 ## TODO: Planned Dataset Integration
 - PlantSeg
