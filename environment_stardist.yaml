@@ -1,0 +1,10 @@
+channels:
+    - conda-forge
+name:
+    tukra-stardist
+dependencies:
+    - tensorflow
+    - stardist
+    - pip
+    - pip:
+        - natsort

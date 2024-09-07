@@ -1,4 +1,5 @@
-from typing import Optional, List
+import os
+from typing import Optional, List, Union
 
 import numpy as np
 
@@ -34,13 +35,17 @@ def segment_using_cellpose(
     channels: List[int] = [0, 0],
     diameter: Optional[int] = None,
 ):
-    """Supports CellPose models.
-    Arguments:
-        image: The input image
-        model_choice: The choice of cellpose model. See 'MODEL_CHOICES' above.
-        restoration_choice: The choice of image restoration cellpose model. See 'RESTORATION_CHOICE' above.
-        channels: TODO
-        diameter: TODO
+    """Supports inference on images using pretrained CellPose models.
+
+    Args:
+        image (np.ndarray): The input image
+        model_choice (str): The choice of cellpose model. See 'MODEL_CHOICES' above.
+        restoration_choice (str, None): The choice of image restoration cellpose model. See 'RESTORATION_CHOICE' above.
+        channels (List[int]): The channel parameters to be used for inference.
+        diameter (int, None): The diameter of the objects.
+
+    Returns:
+        masks (np.ndarray): The instance segmentation.
     """
     use_gpu = torch.cuda.is_available()
 
@@ -66,5 +71,35 @@ def segment_using_cellpose(
             gpu=use_gpu, model_type=model_choice, restore_type=restoration_choice,
         )
         masks, flows, styles, denoised_images = model.eval(image, diameter=diameter, channels=channels)
+
+    return masks
+
+
+def segment_using_custom_cellpose(
+    image: np.ndarray,
+    checkpoint_path: Union[os.PathLike, str],
+    channels: List[int] = [0, 0],
+    diameter: Union[float, int] = 0,
+    **kwargs
+):
+    """Supports inference on images using custom trained (or finetuned) CellPose models.
+
+    Args:
+        image (np.ndarray): The input image
+        checkpoint_path (os.PathLike, str): The path where the trained model checkpoints are stored.
+        channels (List[int]): The channel parameters to be used for inference.
+        diameter (int, None): The diameter of the objects.
+
+    Returns:
+        masks (np.ndarray): The instance segmentation.
+    """
+    use_gpu = torch.cuda.is_available()
+
+    model = models.CellposeModel(gpu=use_gpu, pretrained_model=checkpoint_path)
+
+    if diameter == 0:
+        diameter = model.diam_labels
+
+    masks, flows, styles = model.eval(image, diameter=diameter, channels=channels, **kwargs)
 
     return masks
