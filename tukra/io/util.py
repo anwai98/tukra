@@ -34,7 +34,7 @@ def read_image(
 
     Returns the numpy array for each supported formats.
     """
-    assert os.path.exists(input_path)
+    assert os.path.exists(input_path), input_path
 
     if extension[0] != ".":
         extension = f".{extension}"

@@ -77,12 +77,14 @@ def convert_images_and_labels_for_nnunet(
 
 
 class CreateJsonFileForCustomSplits:
+    """
+    """
     def __init__(
         self,
         root_dir: Union[os.PathLike, str],
         dataset_name: str,
-        channel_names: Dict[Any],
-        labels: Dict[Any],
+        channel_names: Dict,
+        labels: Dict,
         description: str,
         extension: str = ".nii.gz",
         have_val: bool = False,
