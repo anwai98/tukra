@@ -13,14 +13,24 @@ from ..io import read_image, write_image
 class ConvertInputsToNifti:
     """Converts the inputs to a desired file format.
     """
-    def __init__(self, src_extension: str, dst_extension: str = ".nii.gz"):
+    def __init__(
+        self,
+        src_extension: str,
+        dst_extension: str = ".nii.gz",
+        make_channels_first: bool = False,
+    ):
         self.src_extension = src_extension
         self.dst_extension = dst_extension
+        self.make_channels_first = make_channels_first
 
     def __call__(
         self, input_path: Union[os.PathLike, str], target_path: Union[os.PathLike, str]
     ):
         input_array = read_image(input_path=input_path, extension=self.src_extension)
+
+        if self.make_channels_first:
+            input_array = input_array.transpose(2, 0, 1)
+
         write_image(image=input_array, dst_path=target_path, desired_fmt=self.dst_extension)
 
 
@@ -41,9 +51,11 @@ def convert_images_and_labels_for_nnunet(
         ...
     """
     # Let's set the expected directories.
-    dirname = "imagesTs" if split_name == "test" else "imagesTr"
-    image_dir = os.path.join(root_dir, "nnUNet_raw", dataset_name, dirname)
-    gt_dir = os.path.join(root_dir, "nnUNet_raw", dataset_name, dirname)
+    idirname = "imagesTs" if split_name == "test" else "imagesTr"
+    gdirname = "labelsTs" if split_name == "test" else "labelsTr"
+
+    image_dir = os.path.join(root_dir, "nnUNet_raw", dataset_name, idirname)
+    gt_dir = os.path.join(root_dir, "nnUNet_raw", dataset_name, gdirname)
 
     os.makedirs(image_dir, exist_ok=True)
     os.makedirs(gt_dir, exist_ok=True)
@@ -61,6 +73,9 @@ def convert_images_and_labels_for_nnunet(
 
             trg_image_path = os.path.join(image_dir, f"{image_id}_{split}_0000.nii.gz")
             trg_gt_path = os.path.join(gt_dir, f"{image_id}_{split}.nii.gz")
+
+            if os.path.exists(trg_image_path) and os.path.exists(trg_gt_path):
+                continue
 
             if convert_inputs_function is None:
                 shutil.copy(src=image_path, dst=trg_image_path)
@@ -137,3 +152,5 @@ class CreateJsonFileForCustomSplits:
             all_split_inputs = [{'train': train_ids, 'val': val_ids} for _ in range(5)]
             with open(self.splits_json_fpath, "w") as f:
                 json.dump(all_split_inputs, f, indent=4)
+
+        print(f"'dataset.json' is saved at '{self.dataset_json_fpath}'.")
