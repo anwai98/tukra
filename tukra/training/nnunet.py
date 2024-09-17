@@ -40,6 +40,7 @@ def train_nnunetv2(
     plans: str = "nnUNetResEncUNetLPlans",
     fold: int = 0,
     have_prepared_splits: bool = True,
+    compile_model: bool = False,
 ):
     """Function to train nnUNet in the expected structure.
 
@@ -61,7 +62,8 @@ def train_nnunetv2(
 
     # Train your own nnUNet
     gpus = torch.cuda.device_count()
-    cmd = f"nnUNet_compile=T nnUNet_n_proc_DA=8 nnUNetv2_train {dataset_id} {dim} {fold} -num_gpus {gpus} --c "
+    _compile = "T" if compile_model else "f"
+    cmd = f"nnUNet_compile={_compile} nnUNet_n_proc_DA=8 nnUNetv2_train {dataset_id} {dim} {fold} -num_gpus {gpus} --c "
     cmd += f"-p {plans}"
     os.system(cmd)
 
