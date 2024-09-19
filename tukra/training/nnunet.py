@@ -95,12 +95,7 @@ def predict_nnunetv2(
     os.system(cmd)
 
 
-def _get_inference_paths(root_dir, dataset_name, fold, return_all_predictions=False):
+def _get_inference_paths(root_dir, dataset_name, fold):
     output_dir = os.path.join(root_dir, "nnUNet_raw", dataset_name, "predictionTs", f"fold_{fold}")
-
-    if return_all_predictions:
-        output_paths = natsorted(glob(os.path.join(output_dir, "*.nii.gz")))
-        return output_paths
-    else:
-        input_dir = os.path.join(root_dir, "nnUNet_raw", dataset_name, "imagesTs")
-        return input_dir, output_dir
+    input_dir = os.path.join(root_dir, "nnUNet_raw", dataset_name, "imagesTs")
+    return input_dir, output_dir
