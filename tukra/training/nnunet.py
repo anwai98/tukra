@@ -1,6 +1,8 @@
 import os
 import warnings
+from glob import glob
 from typing import Union
+from natsort import natsorted
 
 import torch
 
@@ -86,10 +88,19 @@ def predict_nnunetv2(
         plans: The plan designed for the experiments for training nnUNet.
         fold: The fold for training nnUNet.
     """
-    input_dir = os.path.join(root_dir, "nnUNet_raw", dataset_name, "imagesTs")
-    assert os.path.exists(input_dir), "The input folder does not exists."
-
-    output_dir = os.path.join(root_dir, "nnUNet_raw", dataset_name, "predictionTs", f"fold_{fold}")
+    input_dir, output_dir = _get_inference_paths(root_dir, dataset_name, fold)
+    assert os.path.exists(input_dir), "The input folder does not exists. Please preprocess the input images first."
 
     cmd = f"nnUNetv2_predict -i {input_dir} -o {output_dir} -d {dataset_id} -c {dim} -f {fold} -p {plans}"
     os.system(cmd)
+
+
+def _get_inference_paths(root_dir, dataset_name, fold, return_all_predictions=False):
+    output_dir = os.path.join(root_dir, "nnUNet_raw", dataset_name, "predictionTs", f"fold_{fold}")
+
+    if return_all_predictions:
+        output_paths = natsorted(glob(os.path.join(output_dir, "*.nii.gz")))
+        return output_paths
+    else:
+        input_dir = os.path.join(root_dir, "nnUNet_raw", dataset_name, "imagesTs")
+        return input_dir, output_dir
