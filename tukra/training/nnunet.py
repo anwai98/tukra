@@ -89,7 +89,7 @@ def predict_nnunetv2(
     input_dir = os.path.join(root_dir, "nnUNet_raw", dataset_name, "imagesTs")
     assert os.path.exists(input_dir), "The input folder does not exists."
 
-    output_dir = os.path.join(root_dir, "nnUNet_raw", dataset_name, "predictionTs")
+    output_dir = os.path.join(root_dir, "nnUNet_raw", dataset_name, "predictionTs", f"fold_{fold}")
 
     cmd = f"nnUNetv2_predict -i {input_dir} -o {output_dir} -d {dataset_id} -c {dim} -f {fold} -p {plans}"
     os.system(cmd)
