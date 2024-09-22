@@ -1,8 +1,6 @@
 import os
 import warnings
-from glob import glob
 from typing import Union
-from natsort import natsorted
 
 import torch
 
