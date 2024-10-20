@@ -29,10 +29,21 @@ def tukra_viewer(input_paths, keys=None, channels_first=False):
 
 def main():
     import argparse
-    parser = argparse.ArgumentParser(description="")
-    parser.add_argument("-i", "--input_path", nargs="+", type=str, required=True, help="")
-    parser.add_argument("-k", "--key", nargs="*", type=str, default=None, help="")
-    parser.add_argument("--ensure_channels_first", action="store_true", help="")
+    parser = argparse.ArgumentParser(description="Visualize images in napari.")
+    parser.add_argument(
+        "-i", "--input_path", nargs="+", type=str, required=True,
+        help="Expects a filepath or a sequence of filepaths to the image data. Currently supports all file "
+        "formats supported by 'tukra' (eg. nifty, mha, dicom, nrrd, imageio-supported formats: tif, png, etc., "
+        "elf-supported formats): hdf5, zarr, n5, mrc, knossos."
+    )
+    parser.add_argument(
+        "-k", "--key", nargs="*", type=str, default=None,
+        help="The key for opening data with 'elf.io.open_file'. This is the hierarchy name for a hdf5 or "
+        "zarr container, for an image stack it is a wild-card, e.g. '*.png' and for mrc it is 'data'."
+    )
+    parser.add_argument(
+        "--channels_first", action="store_true", help="Whether to convert channels as the first axes."
+    )
     args = parser.parse_args()
 
     _input_paths = args.input_path
@@ -49,7 +60,7 @@ def main():
         if "*" in ipath:
             _input_paths.extend(glob(os.path.join(ipath)))
 
-    tukra_viewer(input_paths=_input_paths, keys=_keys, channels_first=args.ensure_channels_first)
+    tukra_viewer(input_paths=_input_paths, keys=_keys, channels_first=args.channels_first)
 
 
 if __name__ == "__main__":
