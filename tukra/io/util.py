@@ -82,7 +82,6 @@ def read_image(
             input_array = inputs.pixel_array
 
         elif len(set(suffixes) - _all_imageio_formats()) == 0:
-            breakpoint()
             import imageio.v3 as imageio
             inputs = imageio.imread(input_path)
             input_array = inputs
