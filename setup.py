@@ -10,4 +10,9 @@ setup(
     author_email='anwai.archit@uni-goettingen.de',
     url='https://user.informatik.uni-goettingen.de/~pape41/',
     packages=['tukra'],
+    entry_points={
+        "console_scripts": [
+            "tukra.viewer = tukra.viewer.image_viewer:main"
+        ]
+    }
 )
