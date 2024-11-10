@@ -4,6 +4,26 @@ from typing import Union, Optional
 
 import numpy as np
 
+try:
+    import nibabel as nib
+except ImportError:
+    nib = None
+
+try:
+    import nrrd
+except ImportError:
+    nrrd = None
+
+try:
+    import SimpleITK as sitk
+except ImportError:
+    sitk = None
+
+try:
+    import pydicom as dicom
+except ImportError:
+    dicom = None
+
 
 def _all_imageio_formats():
     import imageio
@@ -62,22 +82,22 @@ def read_image(
             suffixes = [extension]
 
         if ".nii" in suffixes or ".nii.gz" in suffixes:
-            import nibabel as nib
+            assert nib is not None, "Please install 'nibabel'."
             inputs = nib.load(input_path)
             input_array = inputs.get_fdata()
 
         elif ".nrrd" in suffixes or ".seg.nrrd" in suffixes:
-            import nrrd
+            assert nrrd is not None, "Please install 'nrrd'."
             input_array, header = nrrd.read(input_path)
             inputs = input_array
 
         elif suffixes[-1] == ".mha":
-            import SimpleITK as sitk
+            assert sitk is not None, "Please install 'SimpleITK'."
             inputs = sitk.ReadImage(input_path)
             input_array = sitk.GetArrayFromImage(inputs)
 
         elif suffixes[-1] == ".dcm":
-            import pydicom as dicom
+            assert dicom is not None, "Please install 'pydicom'."
             inputs = dicom.dcmread(input_path)
             input_array = inputs.pixel_array
 
@@ -115,7 +135,7 @@ def write_image(
     Returns the numpy array for each supported formats.
     """
     if desired_fmt in [".nii", ".nii.gz"]:
-        import nibabel as nib
+        assert nib is not None, "Please install 'nibabel'."
         image_nifti = nib.Nifti2Image(image, np.eye(4))
         nib.save(image_nifti, dst_path)
 
