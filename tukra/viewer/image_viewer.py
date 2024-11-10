@@ -3,6 +3,11 @@ from glob import glob
 
 from ..io import read_image
 
+try:
+    import napari
+except ImportError:
+    napari = None
+
 
 def tukra_viewer(input_paths, keys=None, channels_first=False):
     """Opens the image data located at the provided filepath.
@@ -12,17 +17,18 @@ def tukra_viewer(input_paths, keys=None, channels_first=False):
         keys: List of hierarchy names for container-based data structures.
         channels_first: Whether to make channels first in 3d volumes.
     """
-    import napari
+    assert napari is not None, "Please install 'napari'."
+
     _viewer = napari.Viewer()
 
-    for input_path, key in zip(input_paths, keys):
+    for idx, (input_path, key) in enumerate(zip(input_paths, keys)):
         image = read_image(input_path=input_path, key=key)
 
         if channels_first:
             assert image.ndim == 3,  "The channels first feature is supported for 3d volumes only."
             image = image.transpose(2, 0, 1)
 
-        _viewer.add_image(image)
+        _viewer.add_image(image, name=f"Image_{idx}" if key is None else key)
 
     napari.run()
 
@@ -31,7 +37,7 @@ def main():
     import argparse
     parser = argparse.ArgumentParser(description="Visualize images in napari.")
     parser.add_argument(
-        "-i", "--input_path", nargs="+", type=str, required=True,
+        "input_path", nargs="+", type=str,
         help="Expects a filepath or a sequence of filepaths to the image data. Currently supports all file "
         "formats supported by 'tukra' (eg. nifty, mha, dicom, nrrd, imageio-supported formats: tif, png, etc., "
         "elf-supported formats): hdf5, zarr, n5, mrc, knossos."

@@ -61,12 +61,12 @@ def read_image(
 
             suffixes = [extension]
 
-        if ".nii" in suffixes:
+        if ".nii" in suffixes or ".nii.gz" in suffixes:
             import nibabel as nib
             inputs = nib.load(input_path)
             input_array = inputs.get_fdata()
 
-        elif ".nrrd" in suffixes:
+        elif ".nrrd" in suffixes or ".seg.nrrd" in suffixes:
             import nrrd
             input_array, header = nrrd.read(input_path)
             inputs = input_array
