@@ -6,10 +6,13 @@ import numpy as np
 
 from tukra.io import read_image
 
-from csbdeep.utils import normalize
-
-from stardist.models import Config2D, StarDist2D
-from stardist import gputools_available, fill_label_holes, calculate_extents
+try:
+    from csbdeep.utils import normalize
+    from stardist.models import Config2D, StarDist2D
+    from stardist import gputools_available, fill_label_holes, calculate_extents
+    _stardist_is_installed = True
+except ImportError:
+    _stardist_is_installed = False
 
 
 def run_stardist_training(
@@ -28,6 +31,8 @@ def run_stardist_training(
 ):
     """
     """
+    assert _stardist_is_installed, "Please install 'stardist'."
+
     use_gpu = (use_gpu and gputools_available())
 
     train_images = [read_image(path, image_extension) for path in train_image_paths]

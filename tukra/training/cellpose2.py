@@ -1,7 +1,11 @@
 import os
-from typing import List, Optional, Union, Literal
+from typing import List, Optional, Union, Literal, Tuple
 
-from cellpose import train, core, io, models
+try:
+    from cellpose import train, core, io, models
+    _cellpose_is_installed = True
+except ImportError:
+    _cellpose_is_installed = False
 
 
 def run_cellpose2_finetuning(
@@ -21,7 +25,7 @@ def run_cellpose2_finetuning(
     batch_size: int = 8,
     optimizer_choice: Literal["AdamW", "SGD"] = "AdamW",
     **kwargs
-):
+) -> Tuple[Union[os.PathLike, str], float]:
     """Functionality for finetuning (or training) CellPose models.
 
     This script is inspired from: https://github.com/MouseLand/cellpose/blob/main/notebooks/run_cellpose_2.ipynb.
@@ -50,8 +54,11 @@ def run_cellpose2_finetuning(
         kwargs: The additional parameters for the `cellpose.train.tran_seg` functionality.
 
     Returns:
+        model_path: The filepath where the trained model is stored.
         diam_labels: The diameter of objects in labels in the training set.
     """
+    assert _cellpose_is_installed, "Please install 'cellpose'."
+
     # Here we match the channel to number
     channels_to_use_for_training = channels_to_use_for_training.title()
     if channels_to_use_for_training == "Grayscale":

@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Dict
 
 import numpy as np
 
@@ -15,7 +15,7 @@ def evaluate_predictions(
     ground_truth: np.ndarray,
     metrics: List[str] = ["msa"],
     **metric_kwargs
-):
+) -> Dict:
     if isinstance(metrics, str):
         metrics = [metrics]
 
@@ -26,10 +26,9 @@ def evaluate_predictions(
     return results
 
 
-def _evaluate_per_sample(prediction, ground_truth, metric, **metric_kwargs):
+def _evaluate_per_sample(prediction, ground_truth, metric, **metric_kwargs) -> float:
     if metric == "msa" or metric.startswith("sa"):
         msa, sa = mean_segmentation_accuracy(prediction, ground_truth, return_accuracies=True, **metric_kwargs)
-
         if metric == "msa":
             score = msa
         else:
