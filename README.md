@@ -6,7 +6,8 @@ This is a library composed of convenience scripts for evaluating (and training) 
 
 ## Installation:
 - TODO
-    - CellPose: works out of the box
+    - CellPose: works out of the box.
+    - InstanSeg: works out of the box.
     - StarDist: training works only for CPU - need to investigate GPU-supported tensorflow installation.
 
 ## Supported Models:
@@ -20,11 +21,13 @@ This is a library composed of convenience scripts for evaluating (and training) 
 - CellPose
 - CellPose 2
 - CellPose 3
+- InstanSeg
 
 ## TODO: Planned Frameworks
 - nnUNet (support for instance segmentation)
 - SplineDist
 - OmniPose
+- InstanSeg (the training pipeline is not wrapped in a function, but rather over one experiment script. looks difficult to inherit it out-of-the-box here)
 
 ## Supported Datasets:
 > Thanks to <a href="https://github.com/constantinpape/torch-em">`torch-em`</a>
@@ -36,7 +39,6 @@ This is a library composed of convenience scripts for evaluating (and training) 
 - PlantSeg
 - MouseEmbryo
 - DeepBacs
-- DSB
 - Covid IF
 
 ## Supported Evaluation Metrics:
@@ -44,3 +46,4 @@ This is a library composed of convenience scripts for evaluating (and training) 
 - Segmentation Accuracy
     - Mean Segmentation Accuracy
     - Segmentation Accuracy over Intersection of Union (n)%
+    - Dice Score

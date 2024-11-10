@@ -14,8 +14,8 @@ import imageio.v3 as imageio
 
 from torch_em.data.datasets.light_microscopy import livecell, orgasegment
 
-from tukra.inference import segment_using_cellpose
 from tukra.evaluation import evaluate_predictions
+from tukra.inference import segment_using_cellpose
 
 
 def run_cellpose_for_livecell(data_dir, chosen_metrics):
