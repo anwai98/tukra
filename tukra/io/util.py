@@ -115,12 +115,7 @@ def read_image(
         return input_array
 
 
-def write_image(
-    image: np.ndarray,
-    dst_path: Union[os.PathLike, str],
-    desired_fmt: str = ".nii.gz",
-    **kwargs
-):
+def write_image(image: np.ndarray, dst_path: Union[os.PathLike, str], **kwargs):
     """Function to write arrays to most popular biomedical imaging formats.
 
     Current supported formats:
@@ -128,20 +123,22 @@ def write_image(
         - all imageio-supported formats
 
     Args:
-        input_path: The path to the input data.
-        extension: The extension of the input data
-        return_original_manifest: Returns the original data manifest.
+        image: The input array to write to the destination path.
+        dst_path: The destination path where the array will be written.
 
     Returns the numpy array for each supported formats.
     """
-    if desired_fmt in [".nii", ".nii.gz"]:
+    ipath = Path(dst_path.rstrip("/"))
+    suffixes = ipath.suffixes
+
+    if ".nii" in suffixes or ".nii.gz" in suffixes:
         assert nib is not None, "Please install 'nibabel'."
         image_nifti = nib.Nifti2Image(image, np.eye(4))
         nib.save(image_nifti, dst_path)
 
-    elif desired_fmt in _all_imageio_formats():
+    elif len(set(suffixes) - _all_imageio_formats()) == 0:
         import imageio.v3 as imageio
         imageio.imwrite(dst_path, image, **kwargs)
 
     else:
-        raise ValueError(f"'{desired_fmt}' is not a supported format to write images in 'tukra'.")
+        raise ValueError(f"'{suffixes}' is not a supported format to write images in 'tukra'.")
