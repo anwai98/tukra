@@ -19,7 +19,8 @@ def convert_dataset_for_nnunet_training(
     preprocess_inputs: Optional[Callable] = None,
     preprocess_labels: Optional[Callable] = None,
 ):
-    """
+    """Functionality to ensure conversion of assorted filepaths to the input images and respective labels
+    to convert them in common formats (eg. tif and nifti formats) for nnUNet training.
     """
     # The idea is to move all images into specific desired directory,
     # Write their image ids into a 'split.json' file,
@@ -32,9 +33,7 @@ def convert_dataset_for_nnunet_training(
 
     assert len(image_paths) == len(gt_paths)
     ids = []
-    for image_path, gt_path in tqdm(
-        zip(image_paths, gt_paths), total=len(image_paths), desc="Preprocessing inputs"
-    ):
+    for image_path, gt_path in tqdm(zip(image_paths, gt_paths), total=len(image_paths), desc="Preprocessing inputs"):
         image_id = os.path.basename(image_path)
         image_id = image_id.split(".")[0]
 
@@ -43,6 +42,9 @@ def convert_dataset_for_nnunet_training(
 
         target_image_path = os.path.join(image_dir, f"{image_id}_{split}_0000{file_suffix}")
         target_gt_path = os.path.join(gt_dir, f"{image_id}_{split}{file_suffix}")
+
+        if os.path.exists(target_image_path) and os.path.exists(target_gt_path):
+            continue
 
         if transfer_mode == "copy":
             shutil.copy(src=image_path, dst=target_image_path)
@@ -65,6 +67,16 @@ def convert_dataset_for_nnunet_training(
 
         ids.append(Path(target_gt_path).stem)
 
+    if len(ids) != len(image_paths):
+        raise AssertionError(
+            f"Num. of input images don't match the expected num. of converted images. '{len(ids)}; {len(image_paths)}'"
+        )
+
+    if len(ids) != len(gt_paths):
+        raise AssertionError(
+            f"Num. of input labels don't match the expected num. of converted labels. '{len(ids)}; {len(gt_paths)}'"
+        )
+
     return ids
 
 
@@ -72,27 +84,30 @@ def create_json_files(
     dataset_name: str,
     file_suffix: str,
     dataset_json_template: Dict,
-    train_ids: List[os.PathLike, str],
-    val_ids: Optional[List[os.PathLike, str]] = None,
+    train_ids: List[Union[os.PathLike, str]],
+    val_ids: Optional[List[Union[os.PathLike, str]]] = None,
 ):
-    """
+    """Functionality to create:
+    1. `dataset.json` file, which moderates the input metadata (eg. count of data, dataset description, label ids, etc.)
+    2. (OPTIONAL) `splits_final.json` file, which ensures consistent train-val splits (subjected to `val_ids`).
+        By default, performs cross-validation on the entire train-set.
     """
     # First, let's create the 'datasets.json' file based on the available inputs.
     if file_suffix[0] != ".":
         file_suffix = "." + file_suffix
 
     json_file = os.path.join(os.environ.get("nnUNet_raw"), dataset_name, "dataset.json")
-
-    with open(json_file, "w") as f:
-        json.dump(dataset_json_template, f, indent=4)
+    if not os.path.exists(json_file):
+        with open(json_file, "w") as f:
+            json.dump(dataset_json_template, f, indent=4)
 
     # Let's store the split files.
     preprocessed_dir = os.path.join(os.environ.get("nnUNet_preprocessed"), dataset_name)
     os.makedirs(preprocessed_dir, exist_ok=True)
 
-    if val_ids is not None:
+    json_file = os.path.join(preprocessed_dir, "splits_final.json")
+    if val_ids is not None and not os.path.exists(json_file):
         # Create custom splits for all folds - to fit with the expectation.
         all_split_inputs = [{'train': train_ids, 'val': val_ids} for _ in range(5)]
-        json_file = os.path.join(preprocessed_dir, "splits_final.json")
         with open(json_file, "w") as f:
             json.dump(all_split_inputs, f, indent=4)
