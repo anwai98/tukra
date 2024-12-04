@@ -2,7 +2,7 @@ import os
 import shutil
 from tqdm import tqdm
 from pathlib import Path
-from typing import Union, Literal, Callable, List, Optional, Dict
+from typing import Union, Literal, Callable, List, Optional, Dict, Tuple
 
 import json
 
@@ -18,10 +18,15 @@ def convert_dataset_for_nnunet_training(
     transfer_mode: Literal["copy", "store"],
     preprocess_inputs: Optional[Callable] = None,
     preprocess_labels: Optional[Callable] = None,
+    ensure_unique: bool = False,
+    keys: Tuple[str, str] = None,
 ):
     """Functionality to ensure conversion of assorted filepaths to the input images and respective labels
     to convert them in common formats (eg. tif and nifti formats) for nnUNet training.
     """
+    if keys is not None and len(keys) != 2:
+        raise ValueError("The 'keys' argument expects a tuple of keynames for both image and corresponding labels.")
+
     # The idea is to move all images into specific desired directory,
     # Write their image ids into a 'split.json' file,
     # which nnUNet will read to define the custom (fixed) validation split.
@@ -33,6 +38,7 @@ def convert_dataset_for_nnunet_training(
 
     assert len(image_paths) == len(gt_paths)
     ids = []
+    counter = 0
     for image_path, gt_path in tqdm(zip(image_paths, gt_paths), total=len(image_paths), desc="Preprocessing inputs"):
         image_id = os.path.basename(image_path)
         image_id = image_id.split(".")[0]
@@ -40,8 +46,12 @@ def convert_dataset_for_nnunet_training(
         if file_suffix[0] != ".":
             file_suffix = "." + file_suffix
 
-        target_image_path = os.path.join(image_dir, f"{image_id}_{split}_0000{file_suffix}")
-        target_gt_path = os.path.join(gt_dir, f"{image_id}_{split}{file_suffix}")
+        _split = (split + f"_{counter}") if ensure_unique else split
+        counter += 1
+
+        target_image_path = os.path.join(image_dir, f"{image_id}_{_split}_0000{file_suffix}")
+        target_gt_path = os.path.join(gt_dir, f"{image_id}_{_split}{file_suffix}")
+        ids.append(Path(target_gt_path).stem)
 
         if os.path.exists(target_image_path) and os.path.exists(target_gt_path):
             continue
@@ -51,11 +61,11 @@ def convert_dataset_for_nnunet_training(
             shutil.copy(src=gt_path, dst=target_gt_path)
 
         elif transfer_mode == "store":
-            image = read_image(image_path)
+            image = read_image(image_path, key=keys if keys is None else keys[0])
             if preprocess_inputs is not None:
                 image = preprocess_inputs(image)
 
-            gt = read_image(gt_path)
+            gt = read_image(gt_path, key=keys if keys is None else keys[1])
             if preprocess_labels is not None:
                 gt = preprocess_labels(gt)
 
@@ -64,13 +74,6 @@ def convert_dataset_for_nnunet_training(
 
         else:
             raise ValueError(f"'{transfer_mode}' is not a supported transfer mode.")
-
-        ids.append(Path(target_gt_path).stem)
-
-    if len(ids) != len(image_paths):
-        raise AssertionError(
-            f"Num. of input images don't match the expected num. of converted images. '{len(ids)}; {len(image_paths)}'"
-        )
 
     if len(ids) != len(gt_paths):
         raise AssertionError(
@@ -97,17 +100,16 @@ def create_json_files(
         file_suffix = "." + file_suffix
 
     json_file = os.path.join(os.environ.get("nnUNet_raw"), dataset_name, "dataset.json")
-    if not os.path.exists(json_file):
-        with open(json_file, "w") as f:
-            json.dump(dataset_json_template, f, indent=4)
+    with open(json_file, "w") as f:
+        json.dump(dataset_json_template, f, indent=4)
 
     # Let's store the split files.
     preprocessed_dir = os.path.join(os.environ.get("nnUNet_preprocessed"), dataset_name)
     os.makedirs(preprocessed_dir, exist_ok=True)
 
-    json_file = os.path.join(preprocessed_dir, "splits_final.json")
-    if val_ids is not None and not os.path.exists(json_file):
+    if val_ids is not None:
         # Create custom splits for all folds - to fit with the expectation.
         all_split_inputs = [{'train': train_ids, 'val': val_ids} for _ in range(5)]
+        json_file = os.path.join(preprocessed_dir, "splits_final.json")
         with open(json_file, "w") as f:
             json.dump(all_split_inputs, f, indent=4)
