@@ -1,6 +1,5 @@
 import os
 import warnings
-from typing import Union
 
 import torch
 
@@ -33,7 +32,6 @@ def preprocess_data(dataset_id: str, planner: str = "nnUNetPlannerResEncL"):
 
 
 def train_nnunetv2(
-    root_dir: Union[os.PathLike, str],
     dataset_name: str,
     dataset_id: str,
     dim: str,
@@ -45,7 +43,6 @@ def train_nnunetv2(
     """Function to train nnUNet in the expected structure.
 
     Args:
-        root_dir: The parent dir where the nnUNet files are stored.
         dataset_name: The entire name of the dataset in nnUNet-style (say, `Dataset999_XYZ`)
         dataset_id: The dataset id created for the respective nnUNet-style data folder format.
         dim: The nnUNet configuration (2d / 3d_fullres) to train.
@@ -56,7 +53,7 @@ def train_nnunetv2(
     if have_prepared_splits:
         # It's expected that you create folds by yourself in your desired train-val structure.
         _split_file_exists = os.path.exists(
-            os.path.join(root_dir, "nnUNet_preprocessed", dataset_name, "splits_final.json")
+            os.path.join(os.environ.get("nnUNet_preprocessed"), dataset_name, "splits_final.json")
         )
         assert _split_file_exists, "The experiment expects you to create the splits yourself."
 
@@ -69,7 +66,6 @@ def train_nnunetv2(
 
 
 def predict_nnunetv2(
-    root_dir: Union[os.PathLike, str],
     dataset_name: str,
     dataset_id: str,
     dim: str,
@@ -79,21 +75,20 @@ def predict_nnunetv2(
     """Function to predict using trained nnUNet in the expected structure.
 
     Args:
-        root_dir: The parent dir where the nnUNet files are stored.
         dataset_name: The entire name of the dataset in nnUNet-style (say, `Dataset999_XYZ`)
         dataset_id: The dataset id created for the respective nnUNet-style data folder format.
         dim: The nnUNet configuration (2d / 3d_fullres) to train.
         plans: The plan designed for the experiments for training nnUNet.
         fold: The fold for training nnUNet.
     """
-    input_dir, output_dir = _get_inference_paths(root_dir, dataset_name, fold)
+    input_dir, output_dir = _get_inference_paths(dataset_name, fold)
     assert os.path.exists(input_dir), "The input folder does not exists. Please preprocess the input images first."
 
     cmd = f"nnUNetv2_predict -i {input_dir} -o {output_dir} -d {dataset_id} -c {dim} -f {fold} -p {plans}"
     os.system(cmd)
 
 
-def _get_inference_paths(root_dir, dataset_name, fold):
-    output_dir = os.path.join(root_dir, "nnUNet_raw", dataset_name, "predictionTs", f"fold_{fold}")
-    input_dir = os.path.join(root_dir, "nnUNet_raw", dataset_name, "imagesTs")
+def _get_inference_paths(dataset_name, fold):
+    output_dir = os.path.join(os.environ.get("nnUNet_raw"), dataset_name, "predictionTs", f"fold_{fold}")
+    input_dir = os.path.join(os.environ.get("nnUNet_raw"), dataset_name, "imagesTs")
     return input_dir, output_dir
