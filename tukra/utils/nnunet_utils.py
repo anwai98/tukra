@@ -1,7 +1,6 @@
 import os
 import shutil
 from tqdm import tqdm
-from pathlib import Path
 from typing import Union, Literal, Callable, List, Optional, Dict, Tuple
 
 import json
@@ -49,9 +48,10 @@ def convert_dataset_for_nnunet_training(
         _split = (split + f"_{counter}") if ensure_unique else split
         counter += 1
 
-        target_image_path = os.path.join(image_dir, f"{image_id}_{_split}_0000{file_suffix}")
-        target_gt_path = os.path.join(gt_dir, f"{image_id}_{_split}{file_suffix}")
-        ids.append(Path(target_gt_path).stem)
+        fname = f"{image_id}_{_split}"
+        target_image_path = os.path.join(image_dir, f"{fname}_0000{file_suffix}")
+        target_gt_path = os.path.join(gt_dir, f"{fname}{file_suffix}")
+        ids.append(fname)
 
         if os.path.exists(target_image_path) and os.path.exists(target_gt_path):
             continue
