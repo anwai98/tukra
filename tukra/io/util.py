@@ -25,6 +25,9 @@ except ImportError:
     dicom = None
 
 
+ITEMPLATE = "conda install -c conda-forge"
+
+
 def _all_imageio_formats():
     import imageio
     all_formats = set()
@@ -82,22 +85,22 @@ def read_image(
             suffixes = [extension]
 
         if ".nii" in suffixes or ".nii.gz" in suffixes:
-            assert nib is not None, "Please install 'nibabel'."
+            assert nib is not None, f"Please install 'nibabel': '{ITEMPLATE} nibabel'"
             inputs = nib.load(input_path)
             input_array = inputs.get_fdata()
 
         elif ".nrrd" in suffixes or ".seg.nrrd" in suffixes:
-            assert nrrd is not None, "Please install 'nrrd'."
+            assert nrrd is not None, f"Please install 'nrrd': '{ITEMPLATE} pynrrd'."
             input_array, header = nrrd.read(input_path)
             inputs = input_array
 
         elif suffixes[-1] == ".mha":
-            assert sitk is not None, "Please install 'SimpleITK'."
+            assert sitk is not None, f"Please install 'SimpleITK': '{ITEMPLATE} simpleitk'."
             inputs = sitk.ReadImage(input_path)
             input_array = sitk.GetArrayFromImage(inputs)
 
         elif suffixes[-1] == ".dcm":
-            assert dicom is not None, "Please install 'pydicom'."
+            assert dicom is not None, f"Please install 'pydicom': '{ITEMPLATE} pydicom'."
             inputs = dicom.dcmread(input_path)
             input_array = inputs.pixel_array
 
@@ -132,7 +135,7 @@ def write_image(image: np.ndarray, dst_path: Union[os.PathLike, str], **kwargs):
     suffixes = ipath.suffixes
 
     if ".nii" in suffixes or ".nii.gz" in suffixes:
-        assert nib is not None, "Please install 'nibabel'."
+        assert nib is not None, f"Please install 'nibabel': '{ITEMPLATE} nibabel'."
         image_nifti = nib.Nifti2Image(image, np.eye(4))
         nib.save(image_nifti, dst_path)
 
