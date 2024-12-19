@@ -12,7 +12,8 @@ setup(
     packages=['tukra'],
     entry_points={
         "console_scripts": [
-            "tukra.viewer = tukra.viewer.image_viewer:main"
+            "tukra.viewer = tukra.viewer.image_viewer:main",
+            "tukra.inspect = tukra.io.inspect:main"
         ]
     }
 )
