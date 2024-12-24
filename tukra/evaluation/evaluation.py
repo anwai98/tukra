@@ -11,10 +11,7 @@ SUPPORTED_EVALS = [
 
 
 def evaluate_predictions(
-    prediction: np.ndarray,
-    ground_truth: np.ndarray,
-    metrics: List[str] = ["msa"],
-    **metric_kwargs
+    prediction: np.ndarray, ground_truth: np.ndarray, metrics: List[str] = ["msa"], **metric_kwargs
 ) -> Dict:
     if isinstance(metrics, str):
         metrics = [metrics]

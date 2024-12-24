@@ -118,7 +118,7 @@ def read_image(
         return input_array
 
 
-def write_image(image: np.ndarray, dst_path: Union[os.PathLike, str], **kwargs):
+def write_image(dst_path: Union[os.PathLike, str], image: np.ndarray, **kwargs):
     """Function to write arrays to most popular biomedical imaging formats.
 
     Current supported formats:
@@ -126,10 +126,8 @@ def write_image(image: np.ndarray, dst_path: Union[os.PathLike, str], **kwargs):
         - all imageio-supported formats
 
     Args:
-        image: The input array to write to the destination path.
         dst_path: The destination path where the array will be written.
-
-    Returns the numpy array for each supported formats.
+        image: The input array to write to the destination path.
     """
     ipath = Path(dst_path.rstrip("/"))
     suffixes = ipath.suffixes
