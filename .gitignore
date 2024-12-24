@@ -164,3 +164,6 @@ config.json
 weights_best.h5
 weights_now.h5
 logs/
+
+# Other stuff
+*.png
