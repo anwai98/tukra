@@ -9,6 +9,8 @@ This is a library composed of convenience scripts for evaluating (and training) 
     - CellPose: works out of the box.
     - InstanSeg: works out of the box.
     - StarDist: training works only for CPU - need to investigate GPU-supported tensorflow installation.
+    - nnUNet: works out of the box from the original repo.
+    - BioMedParse: custom installation from https://github.com/anwai98/BiomedParse -> at `dev` branch
 
 ## Supported Models:
 
@@ -16,15 +18,17 @@ This is a library composed of convenience scripts for evaluating (and training) 
 - CellPose
 - CellPose 2
 - StarDist
+- nnUNet
 
 ### Inference:
 - CellPose
 - CellPose 2
 - CellPose 3
 - InstanSeg
+- BioMedParse
 
 ## TODO: Planned Frameworks
-- nnUNet (support for instance segmentation)
+- StarDist (inference)
 - SplineDist
 - OmniPose
 - InstanSeg (the training pipeline is not wrapped in a function, but rather over one experiment script. looks difficult to inherit it out-of-the-box here)
@@ -34,6 +38,7 @@ This is a library composed of convenience scripts for evaluating (and training) 
 - LIVECell
 - OrgaSegment
 - DSB
+- PanNuke
 
 ## TODO: Planned Dataset Integration
 - PlantSeg
