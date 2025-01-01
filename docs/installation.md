@@ -1,3 +1,13 @@
+# Installation:
+
+## Installing other methods:
+- TODO
+    - CellPose: works out of the box.
+    - InstanSeg: works out of the box.
+    - StarDist: training works only for CPU - need to investigate GPU-supported tensorflow installation.
+    - nnUNet: works out of the box from the original repo.
+    - BioMedParse: custom installation from https://github.com/anwai98/BiomedParse -> at `dev` branch
+
 ## Steps to install `BioMedParse`:
 
 1. Clone the repository: `git clone https://github.com/anwai98/BiomedParse.git`

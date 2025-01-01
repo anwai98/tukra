@@ -1,7 +1,7 @@
-channels:
-    - conda-forge
 name:
     tukra-stardist
+channels:
+    - conda-forge
 dependencies:
     - tensorflow
     - stardist
