@@ -4,14 +4,6 @@ Welcome to `tukra`.
 
 This is a library composed of convenience scripts for evaluating (and training) popular deep learning-based methods for biomedical image segmentation.
 
-## Installation:
-- TODO
-    - CellPose: works out of the box.
-    - InstanSeg: works out of the box.
-    - StarDist: training works only for CPU - need to investigate GPU-supported tensorflow installation.
-    - nnUNet: works out of the box from the original repo.
-    - BioMedParse: custom installation from https://github.com/anwai98/BiomedParse -> at `dev` branch
-
 ## Supported Models:
 
 ### Training (and Finetuning):
