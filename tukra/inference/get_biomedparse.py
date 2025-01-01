@@ -24,9 +24,7 @@ from tukra.io import read_image
 
 @torch.no_grad()
 def run_biomedparse_inference(
-    input_path: Union[os.PathLike, str, np.ndarray],
-    text_prompts: Optional[List[str]],
-    model: torch.nn.Module
+    input_path: Union[os.PathLike, str, np.ndarray], text_prompts: Optional[List[str]], model: torch.nn.Module,
 ) -> np.ndarray:
     """Scripts to run inference for BioMedParse.
 

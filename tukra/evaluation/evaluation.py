@@ -13,6 +13,17 @@ SUPPORTED_EVALS = [
 def evaluate_predictions(
     prediction: np.ndarray, ground_truth: np.ndarray, metrics: List[str] = ["msa"], **metric_kwargs
 ) -> Dict:
+    """Functionality to evaluate predictions w.r.t. the ground-truth for a specific metric.
+
+    Args:
+        prediction: The predicted labels.
+        ground_truth: The ground-truth labels.
+        metrics: The choice of metric for evaluation.
+        metric_kwargs: Additional arguments for changing default values of evaluation measures.
+
+    Returns:
+        A dictionary of results.
+    """
     if isinstance(metrics, str):
         metrics = [metrics]
 

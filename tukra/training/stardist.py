@@ -23,22 +23,34 @@ def run_stardist_training(
     model_name: str = "stardist",
     save_root: Optional[Union[str, os.PathLike]] = None,
     pretrained_backbone: Optional[str] = None,
-    image_extension: str = ".tif",
     n_channels: Optional[int] = None,
     n_rays: int = 32,
     use_gpu: bool = False,
     grid: Tuple[int, int] = (2, 2),
 ):
-    """
+    """Functionality for finetuning (or training) StarDist models.
+
+    Args:
+        train_image_paths: List of filepaths / arrays of image data for training.
+        train_label_paths: List of filepaths / arrays of label data for training.
+        val_image_paths: List of filepaths / arrays of image data for validation.
+        val_label_paths: List of filepaths / arrays of label data for validation.
+        model_name: The choice of model name to store the checkpoints.
+        save_root: The path where the model checkpoints are stored.
+        pretrained_backbone:
+        n_channels: The number ofinput channels.
+        n_rays: ...
+        use_gpu: Whether to use the GPU for training.
+        grid: ...
     """
     assert _stardist_is_installed, "Please install 'stardist'."
 
     use_gpu = (use_gpu and gputools_available())
 
-    train_images = [read_image(path, image_extension) for path in train_image_paths]
-    train_labels = [read_image(path, image_extension) for path in train_label_paths]
-    val_images = [read_image(path, image_extension) for path in val_image_paths]
-    val_labels = [read_image(path, image_extension) for path in val_label_paths]
+    train_images = [read_image(path) for path in train_image_paths]
+    train_labels = [read_image(path) for path in train_label_paths]
+    val_images = [read_image(path) for path in val_image_paths]
+    val_labels = [read_image(path) for path in val_label_paths]
 
     if n_channels is None:
         n_channels = 1 if train_images[0].ndim == 2 else train_images[0].shape[-1]
@@ -52,12 +64,7 @@ def run_stardist_training(
     val_images = [normalize(x, 1, 99.8, axis=axis_norm) for x in tqdm(val_images)]
     val_labels = [fill_label_holes(y) for y in tqdm(val_labels)]
 
-    configuration = Config2D(
-        n_rays=n_rays,
-        grid=grid,
-        use_gpu=use_gpu,
-        n_channel_in=n_channels,
-    )
+    configuration = Config2D(n_rays=n_rays, grid=grid, use_gpu=use_gpu, n_channel_in=n_channels)
     print(configuration)
 
     model_kwargs = {}

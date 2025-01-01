@@ -19,9 +19,24 @@ def convert_dataset_for_nnunet_training(
     preprocess_labels: Optional[Callable] = None,
     ensure_unique: bool = False,
     keys: Tuple[str, str] = None,
-):
+) -> List[str]:
     """Functionality to ensure conversion of assorted filepaths to the input images and respective labels
     to convert them in common formats (eg. tif and nifti formats) for nnUNet training.
+
+    Args:
+        image_paths: List of filepaths for the image data.
+        gt_paths: List of filepaths for the label data.
+        split: The choice of data split.
+        dataset_name: The name of dataset in nnUNet-style.
+        file_suffix: The filepath extension for images.
+        transfer_mode: The mode of transferring inputs in source path(s) to target path(s).
+        preprocess_inputs: A callable to convert the input images.
+        preprocess_labels: A callable to convert the input labels.
+        ensure_unique: Whether to force all images to have unique id values.
+        keys: Whether the inputs are stored in container formats under specific hierarchy names.
+
+    Returns:
+        List of filenames for the particular split.
     """
     if keys is not None and len(keys) != 2:
         raise ValueError("The 'keys' argument expects a tuple of keynames for both image and corresponding labels.")
@@ -94,6 +109,13 @@ def create_json_files(
     1. `dataset.json` file, which moderates the input metadata (eg. count of data, dataset description, label ids, etc.)
     2. (OPTIONAL) `splits_final.json` file, which ensures consistent train-val splits (subjected to `val_ids`).
         By default, performs cross-validation on the entire train-set.
+
+    Args:
+        dataset_name: The name of dataset in nnUNet-style.
+        file_suffix: The filepath extension for images.
+        dataset_json_template: The json template for creating `dataset.json`, necessary for nnUNet training.
+        train_ids: The list of filenames for training.
+        val_ids: The list of filenames for validation.
     """
     # First, let's create the 'datasets.json' file based on the available inputs.
     if file_suffix[0] != ".":

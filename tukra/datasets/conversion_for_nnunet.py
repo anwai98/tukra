@@ -3,7 +3,7 @@ import shutil
 from tqdm import tqdm
 from glob import glob
 from pathlib import Path
-from typing import Optional, List, Union, Any, Literal, Dict
+from typing import Optional, List, Union, Callable, Literal, Dict
 
 import json
 
@@ -40,7 +40,7 @@ def convert_images_and_labels_for_nnunet(
     image_paths: List[Union[os.PathLike, str]],
     gt_paths: List[Union[os.PathLike, str]],
     split_name: Literal["train", "val", "test"] = "train",
-    convert_inputs_function: Optional[Any] = None,
+    convert_inputs_function: Optional[Callable] = None,
 ):
     """Function to convert the images and respective labels in a desired format.
 
@@ -48,7 +48,12 @@ def convert_images_and_labels_for_nnunet(
     In addition, write a `split.json` file which nnUNet will read to define the custom validation split, if desired.
 
     Args:
-        ...
+        root_dir: The path where the converted images and corresponding labels will be stored.
+        dataset_name: The name of dataset in nnUNet-style.
+        image_paths: The list of filepaths for the image data.
+        gt_paths: The list of filepaths for the corresponding label data.
+        split_name: The choice of data split.
+        convert_inputs_function: A callable function to convert the images and labels.
     """
     # Let's set the expected directories.
     idirname = "imagesTs" if split_name == "test" else "imagesTr"
@@ -92,7 +97,16 @@ def convert_images_and_labels_for_nnunet(
 
 
 class CreateJsonFileForCustomSplits:
-    """
+    """Functionality to create JSON file for custom defined train-val splits.
+
+    Args:
+        root_dir: The path where the images and corresponding labels are stored.
+        dataset_name: The name of dataset in nnUNet-style.
+        channel_names: The dictionary with channel indices and names for input images.
+        labels: The dictionary with label ids and names for input labels.
+        description: A brief description for the training setup.
+        extension: The choice of file extension.
+        have_val: Whether the dataset has a predefined val set.
     """
     def __init__(
         self,

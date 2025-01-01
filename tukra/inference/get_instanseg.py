@@ -14,8 +14,18 @@ def segment_using_instanseg(
     target: Literal["nuclei", "cells", "all_outputs"] = "all_outputs",
     scale: Literal["small", "medium"] = "small",
     **kwargs
-):
-    """
+) -> np.ndarray:
+    """Supports inference on images using pretrained InstanSeg models.
+
+    Args:
+        image: The input image.
+        model_type: The choice of instanseg model.
+        target: The choice of targets to segment.
+        scale: The scale of input images.
+        kwargs: Additional supported arguments for inference.
+
+    Returns:
+        The instance segmentation.
     """
     assert InstanSeg is not None, "Please install 'instanseg'."
     assert model_type in ["brightfield_nuclei", "fluorescence_nuclei_and_cells"]
