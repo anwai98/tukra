@@ -4,9 +4,14 @@ Welcome to `tukra`.
 
 This is a library composed of convenience scripts for evaluating (and training) popular deep learning-based methods for biomedical image segmentation.
 
+## Quick Installation:
+- Clone the repository: `https://github.com/anwai98/tukra.git`
+- Enter the directory of repository: `cd tukra`
+- Install `tukra` from source: `pip install -e .`
+
 ## Supported Models:
 
-### Training (and Finetuning):
+### Training (and/or Finetuning):
 - CellPose
 - CellPose 2
 - StarDist
@@ -23,7 +28,7 @@ This is a library composed of convenience scripts for evaluating (and training) 
 - StarDist (inference)
 - SplineDist
 - OmniPose
-- InstanSeg (the training pipeline is not wrapped in a function, but rather over one experiment script. looks difficult to inherit it out-of-the-box here)
+- InstanSeg
 
 ## Supported Datasets:
 > Thanks to <a href="https://github.com/constantinpape/torch-em">`torch-em`</a>
@@ -39,7 +44,7 @@ This is a library composed of convenience scripts for evaluating (and training) 
 - Covid IF
 
 ## Supported Evaluation Metrics:
-> Thanks to <a href="">`elf`</a>
+> Thanks to <a href="https://github.com/constantinpape/elf">`elf`</a>
 - Segmentation Accuracy
     - Mean Segmentation Accuracy
     - Segmentation Accuracy over Intersection of Union (n)%
