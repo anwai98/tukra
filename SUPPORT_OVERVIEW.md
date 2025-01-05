@@ -10,11 +10,11 @@
 - CellPose
 - CellPose 2
 - CellPose 3
+- StarDist
 - InstanSeg
 - BioMedParse
 
 ## TODO: Planned Frameworks
-- StarDist (inference)
 - SplineDist
 - OmniPose
 - InstanSeg
