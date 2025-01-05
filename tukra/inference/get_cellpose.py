@@ -3,8 +3,6 @@ from typing import Optional, List, Union, Tuple
 
 import numpy as np
 
-import torch
-
 try:
     from cellpose import denoise, models
     _cellpose_is_installed = True
@@ -53,6 +51,7 @@ def segment_using_cellpose(
     """
     assert _cellpose_is_installed, "Please install 'cellpose'."
 
+    import torch
     use_gpu = torch.cuda.is_available()
 
     if restoration_choice is None:
@@ -103,6 +102,7 @@ def segment_using_custom_cellpose(
     """
     assert _cellpose_is_installed, "Please install 'cellpose'."
 
+    import torch
     use_gpu = torch.cuda.is_available()
 
     model = models.CellposeModel(gpu=use_gpu, pretrained_model=checkpoint_path)

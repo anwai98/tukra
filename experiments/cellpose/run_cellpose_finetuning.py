@@ -13,8 +13,8 @@ import imageio.v3 as imageio
 from torch_em.data.datasets.light_microscopy import orgasegment
 
 from tukra.evaluation import evaluate_predictions
-from tukra.training import run_cellpose2_finetuning
 from tukra.inference import segment_using_custom_cellpose
+from tukra.training.cellpose2 import run_cellpose2_finetuning
 
 
 ROOT = "/scratch/share/cidas/cca/data/orgasegment_cp"

@@ -10,10 +10,10 @@
 from tqdm import tqdm
 
 import pandas as pd
-import imageio.v3 as imageio
 
 from torch_em.data.datasets.light_microscopy import livecell, orgasegment
 
+from tukra.io import read_image
 from tukra.evaluation import evaluate_predictions
 from tukra.inference import segment_using_cellpose
 
@@ -23,8 +23,8 @@ def run_cellpose_for_livecell(data_dir, chosen_metrics):
 
     all_results = []
     for image_path, gt_path in tqdm(zip(image_paths, gt_paths), total=len(image_paths)):
-        image = imageio.imread(image_path)
-        gt = imageio.imread(gt_path)
+        image = read_image(image_path)
+        gt = read_image(gt_path)
 
         segmentation = segment_using_cellpose(image=image, model_choice="cyto3")
 
@@ -45,8 +45,8 @@ def run_cellpose_for_orgasegment(data_dir, chosen_metrics):
 
     all_results = []
     for image_path, gt_path in tqdm(zip(image_paths, gt_paths), total=len(image_paths)):
-        image = imageio.imread(image_path)
-        gt = imageio.imread(gt_path)
+        image = read_image(image_path)
+        gt = read_image(gt_path)
 
         segmentation = segment_using_cellpose(image=image, model_choice="cyto2")
 
