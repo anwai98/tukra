@@ -1,14 +1,18 @@
 #!/usr/bin/env python
 
+import runpy
 from distutils.core import setup
+
+
+__version__ = runpy.run_path("tukra/__version__.py")["__version__"]
+
 
 setup(
     name='tukra',
-    version='0.0.1',
-    description='Functionality for evaluating deep learning-based segmentation methods.',
+    version=__version__,
     author='Anwai Archit',
     author_email='anwai.archit@uni-goettingen.de',
-    url='https://user.informatik.uni-goettingen.de/~pape41/',
+    url='https://github.com/anwai98/tukra',
     packages=['tukra'],
     license="MIT",
     entry_points={
