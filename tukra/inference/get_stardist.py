@@ -35,10 +35,17 @@ def segment_using_stardist(
     if model is None:
         raise RuntimeError("The model should not be 'None'. Something went wrong.")
 
-    if image.ndim == 2:  # We leave grayscale images as it is.
-        pass
-    elif image.ndim == 3 and image.shape[-1] == 3:  # For RGB data, we average the channels.
-        image = np.mean(image, axis=-1)
+    if model_name == "2D_versatile_he":
+        if image.ndim == 2:  # Triplicate the image to match 3 channels
+            image = np.stack([image] * 3, axis=-1)
+        elif image.ndim == 3:
+            assert image.shape[-1] == 3, f"Make sure that the images are channels last: '{image.shape}'"
+
+    else:
+        if image.ndim == 2:  # We leave grayscale images as it is.
+            pass
+        elif image.ndim == 3 and image.shape[-1] == 3:  # For RGB data, we average the channels.
+            image = np.mean(image, axis=-1)
 
     input_ = normalize(image, 1.0, 99.8)
     seg, _ = model.predict_instances(input_, scale=scale)
