@@ -32,11 +32,39 @@ def evaluate_dsb(data_dir, chosen_metrics):
     print(mean_results)
 
 
+def evaluate_puma(data_dir, chosen_metrics):
+    volume_paths = natsorted(glob(os.path.join(data_dir, "test", "preprocessed", "*.h5")))
+
+    all_results = []
+    for vol_path in volume_paths:
+        image = read_image(vol_path, key="raw")
+        # Ensure channels last
+        image = image.transpose(1, 2, 0)
+
+        gt = read_image(vol_path, key="labels/nuclei")
+
+        segmentation = segment_using_stardist(image=image, model_name="2D_versatile_he")
+
+        scores = evaluate_predictions(segmentation, gt, metrics=chosen_metrics)
+        all_results.append(pd.DataFrame.from_dict([scores]))
+
+    results = pd.concat(all_results)
+
+    mean_results = {}
+    for metric in chosen_metrics:
+        mean_results[metric] = results[metric].mean()
+
+    print(mean_results)
+
+
 def main():
     chosen_metrics = ["msa", "sa50", "sa75"]
 
-    data_dir = "/mnt/vast-nhr/projects/cidas/cca/data/dsb"
-    evaluate_dsb(data_dir, chosen_metrics)
+    # data_dir = "/mnt/vast-nhr/projects/cidas/cca/data/dsb"
+    # evaluate_dsb(data_dir, chosen_metrics)
+
+    data_dir = "/mnt/vast-nhr/projects/cidas/cca/experiments/patho_sam/data/puma"
+    evaluate_puma(data_dir, chosen_metrics)
 
 
 if __name__ == "__main__":
