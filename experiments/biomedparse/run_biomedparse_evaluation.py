@@ -2,15 +2,16 @@ import os
 from glob import glob
 
 import h5py
-import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
 
 from torch_em.data.datasets.histopathology.pannuke import get_pannuke_paths
 
 from tukra.inference import get_biomedparse
 from tukra.io import read_image, write_image
 from tukra.evaluation import evaluate_predictions
+
+
+ROOT_DIR = "/mnt/vast-nhr/projects/cidas/cca/data/pannuke"
 
 
 def _preprocess_pannuke_dataset():
@@ -22,9 +23,7 @@ def _preprocess_pannuke_dataset():
 
     os.makedirs(res_dir, exist_ok=True)
 
-    input_path = get_pannuke_paths(
-        path="/mnt/vast-nhr/projects/cidas/cca/data/pannuke", folds=["fold_3"], download=True
-    )[0]
+    input_path = get_pannuke_paths(path=ROOT_DIR, folds=["fold_3"], download=True)[0]
 
     with h5py.File(input_path, "r") as f:
         images = f["images"][:]
@@ -33,7 +32,6 @@ def _preprocess_pannuke_dataset():
     images = images.transpose(1, 2, 3, 0)  # make channels last
 
     for i, (image, label) in enumerate(zip(images, labels)):
-        print(image.shape, label.shape)
         write_image(os.path.join(res_dir, f"image_{i}.png"), image.astype("uint8"))
         write_image(os.path.join(res_dir, f"gt_{i}.png"), label.astype("uint8"))
 
@@ -55,17 +53,6 @@ def evaluate_segmentation(segmentation, gt):
 
 
 def visualize_results(image, gt, segmentation, prompts):
-    def _generate_colors(n):
-        cmap = plt.get_cmap('tab10')
-        colors = [tuple(int(255 * val) for val in cmap(i)[:3]) for i in range(n)]
-        return colors
-
-    colors = _generate_colors(len(prompts))
-
-    legend_patches = [
-        mpatches.Patch(color=np.array(color) / 255, label=prompt) for color, prompt in zip(colors, prompts)
-    ]
-
     fig, axes = plt.subplots(1, 2 + len(prompts), figsize=(20, 10))
     axes[0].imshow(image)
     axes[0].set_title("Original Image")
@@ -74,38 +61,42 @@ def visualize_results(image, gt, segmentation, prompts):
     axes[1].imshow(gt)
     axes[1].set_title("Ground Truth")
     axes[1].axis('off')
-    axes[1].legend(handles=legend_patches, loc='upper right', fontsize='small')
-
-    print(segmentation.shape)
 
     axc = 2
     for i, prompt in enumerate(prompts):
         axes[axc].imshow(segmentation[i])
         axes[axc].set_title(f"Predictions: '{prompt}'")
         axes[axc].axis('off')
-        axes[axc].legend(handles=legend_patches, loc='upper right', fontsize='small')
         axc += 1
 
-    plt.savefig("./test.png")
+    plt.savefig("./test.png", bbox_inches="tight")
     plt.close()
 
 
 def main():
-    model = get_biomedparse.get_biomedparse_model(
-        checkpoint_path="/mnt/vast-nhr/projects/cidas/cca/models/biomedparse/biomedparse_v1.pt"
-    )
+    # Filepath to model checkpoints
+    model = get_biomedparse.get_biomedparse_model()
 
     # Preprocess PanNuke images
     image_paths, gt_paths = _preprocess_pannuke_dataset()
 
-    # Choice of prompts
-    prompts = ["nuclei"]
+    # Mode of segmentation
+    automatic_segmentation = True
 
     for image_path, gt_path in zip(image_paths, gt_paths):
         image = read_image(image_path)
         gt = read_image(gt_path)
 
-        segmentation = get_biomedparse.run_biomedparse_inference(image, prompts, model)
+        if automatic_segmentation:
+            modality_type = "Pathology"  # The choice of supported imaging modality.
+            prediction = get_biomedparse.run_biomedparse_automatic_inference(image, modality_type, model)
+            prompts = list(prediction.keys())  # Extracting detected classes.
+            segmentation = list(prediction.values())  # Extracting the segmentations.
+
+        else:
+            prompts = ["nuclei"]  # The choice of prompts
+            segmentation = get_biomedparse.run_biomedparse_prompt_based_inference(image, prompts, model)
+
         evaluate_segmentation(segmentation, gt)
         visualize_results(image, gt, segmentation, prompts)
 
