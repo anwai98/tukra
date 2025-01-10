@@ -12,7 +12,7 @@
 - CellPose 3
 - StarDist
 - InstanSeg
-- BioMedParse
+- BioMedParse (both prompt-based and automatic)
 
 ## TODO: Planned Frameworks
 - SplineDist
