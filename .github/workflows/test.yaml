@@ -1,0 +1,33 @@
+name: test
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    name: ${{ matrix.os }} ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python-version: ["3.11"]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup micromamba
+        uses: mamba-org/setup-micromamba@v1
+        with:
+          environment-file: environment.yaml
+          create-args: >-
+            python=${{ matrix.python-version }}
+
+      - name: Install package
+        shell: bash -l {0}
+        run: pip install --no-deps -e .
+
+      - name: Run tests
+        shell: bash -l {0}
+        run: python -m unittest discover -s test -v
