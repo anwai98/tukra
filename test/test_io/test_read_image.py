@@ -11,6 +11,7 @@ class TestReadImage(unittest.TestCase):
         expected_shape = (27, 128, 128)
 
         # Download the file on the fly.
+        # NOTE: The following test image is taken from: https://github.com/tlnagy/exampletiffs.
         url = "https://github.com/tlnagy/exampletiffs/raw/master/mri.tif"
         image_path = "mri.tif"
         urllib.request.urlretrieve(url, image_path)
