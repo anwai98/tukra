@@ -1,0 +1,15 @@
+name: tukra-dev
+channels:
+    - conda-forge
+dependencies:
+  - pynrrd
+  - imageio
+  - nibabel
+  - pydicom
+  - python-elf
+  - numpy <=1.26.4
+  - natsort
+  - imagecodecs
+  - pip
+  - pip:
+      - SimpleITK
