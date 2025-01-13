@@ -33,7 +33,7 @@ def segment_using_instanseg(
     if image.ndim == 2:  # InstanSeg does not accept one channel images. Convert to RGB-style to avoid param mismatch.
         image = np.stack([image] * 3, axis=-1)
 
-    model = InstanSeg("brightfield_nuclei", verbosity=1)
+    model = InstanSeg(model_type, verbosity=1)
 
     if scale == "small":
         labels, _ = model.eval_small_image(image=image, target=target, **kwargs)
