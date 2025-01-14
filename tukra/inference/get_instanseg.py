@@ -6,7 +6,8 @@ try:
     from instanseg import InstanSeg
 except ImportError:
     InstanSeg = None
-
+import os
+import torch
 
 def segment_using_instanseg(
     image: np.ndarray,
@@ -32,9 +33,14 @@ def segment_using_instanseg(
 
     if image.ndim == 2:  # InstanSeg does not accept one channel images. Convert to RGB-style to avoid param mismatch.
         image = np.stack([image] * 3, axis=-1)
-
-    model = InstanSeg(model_type, verbosity=1)
-
+    
+    bioimageio_path = os.environ.get("INSTANSEG_BIOIMAGEIO_PATH")
+    if bioimageio_path:
+        model = InstanSeg(torch.jit.load(os.path.join(bioimageio_path, model_type, "instanseg.pt")), verbosity=0)
+    else: 
+        model = InstanSeg(model_type, verbosity=0)
+        print("InstanSeg will be downloaded.")
+    
     if scale == "small":
         labels, _ = model.eval_small_image(image=image, target=target, **kwargs)
     elif scale == "medium":  # enables tiling window based prediction
