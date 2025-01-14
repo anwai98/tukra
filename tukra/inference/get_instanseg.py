@@ -1,6 +1,9 @@
+import os
 from typing import Literal
 
 import numpy as np
+
+import torch
 
 try:
     from instanseg import InstanSeg
@@ -13,6 +16,7 @@ def segment_using_instanseg(
     model_type: Literal["brightfield_nuclei", "fluorescence_nuclei_and_cells"],
     target: Literal["nuclei", "cells", "all_outputs"] = "all_outputs",
     scale: Literal["small", "medium"] = "small",
+    verbosity: bool = True,
     **kwargs
 ) -> np.ndarray:
     """Supports inference on images using pretrained InstanSeg models.
@@ -22,6 +26,7 @@ def segment_using_instanseg(
         model_type: The choice of instanseg model.
         target: The choice of targets to segment.
         scale: The scale of input images.
+        verbosity: The choice of verbosity for model prediction.
         kwargs: Additional supported arguments for inference.
 
     Returns:
@@ -32,8 +37,12 @@ def segment_using_instanseg(
 
     if image.ndim == 2:  # InstanSeg does not accept one channel images. Convert to RGB-style to avoid param mismatch.
         image = np.stack([image] * 3, axis=-1)
+    
+    bioimageio_path = os.environ.get("INSTANSEG_BIOIMAGEIO_PATH")
+    if bioimageio_path:
+        model_type = torch.jit.load(os.path.join(bioimageio_path, model_type, "instanseg.pt"))
 
-    model = InstanSeg(model_type, verbosity=1)
+    model = InstanSeg(model_type=model_type, verbosity=(1 if verbosity else 0))
 
     if scale == "small":
         labels, _ = model.eval_small_image(image=image, target=target, **kwargs)
