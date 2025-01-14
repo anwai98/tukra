@@ -42,7 +42,7 @@ def segment_using_instanseg(
     if bioimageio_path:
         model_type = torch.jit.load(os.path.join(bioimageio_path, model_type, "instanseg.pt"))
 
-    model = InstanSeg(model_type=model_type, verbosity=(1 if verbosity else 0 ))
+    model = InstanSeg(model_type=model_type, verbosity=(1 if verbosity else 0))
 
     if scale == "small":
         labels, _ = model.eval_small_image(image=image, target=target, **kwargs)
