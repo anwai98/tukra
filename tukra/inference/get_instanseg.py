@@ -35,8 +35,6 @@ def segment_using_instanseg(
     assert InstanSeg is not None, "Please install 'instanseg'."
     assert model_type in ["brightfield_nuclei", "fluorescence_nuclei_and_cells"]
 
-    verbosity = 1 if verbosity else 0 
-
     if image.ndim == 2:  # InstanSeg does not accept one channel images. Convert to RGB-style to avoid param mismatch.
         image = np.stack([image] * 3, axis=-1)
     
@@ -44,8 +42,8 @@ def segment_using_instanseg(
     if bioimageio_path:
         model_type = torch.jit.load(os.path.join(bioimageio_path, model_type, "instanseg.pt"))
 
-    model = InstanSeg(model_type=model_type, verbosity=verbosity)
-    
+    model = InstanSeg(model_type=model_type, verbosity=(1 if verbosity else 0 ))
+
     if scale == "small":
         labels, _ = model.eval_small_image(image=image, target=target, **kwargs)
     elif scale == "medium":  # enables tiling window based prediction
