@@ -148,7 +148,7 @@ def run_biomedparse_automatic_inference(
         batch_targets = image_targets[i: i+batch_size]
 
         # Run batched inference.
-        pred_mask = _run_biomedparse_batched_inference(image, height, width, model, batch_targets)
+        pred_mask = _run_biomedparse_batched_inference(image, height, width, model, batch_targets, verbose)
 
         # Iterate through the predictions for a specific modality by prompting the model
         # for a set of masks and merge them in the following step.
