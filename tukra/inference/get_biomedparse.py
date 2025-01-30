@@ -1,4 +1,5 @@
 import os
+import warnings
 from pathlib import Path
 from typing import Union, List, Optional, Dict
 
@@ -170,9 +171,14 @@ def run_biomedparse_automatic_inference(
             p_values[target] = adj_p_value
 
     predicts = non_maxima_suppression(predicts, p_values)
-    masks = combine_masks(predicts)
 
-    return {target: mask for target, mask in masks.items()}
+    # It could be the case that the model predicts nothing. In this case, we return 'None'.
+    if predicts:
+        masks = combine_masks(predicts)
+        return {target: mask for target, mask in masks.items()}
+    else:
+        warnings.warn("The model did not segment anything.")
+        return None
 
 
 def _get_biomedparse_cachedir():
