@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from typing import Union, Optional
+from typing import Union, Tuple, Optional
 
 import numpy as np
 
@@ -24,6 +24,11 @@ try:
 except ImportError:
     dicom = None
 
+try:
+    import slideio
+except ImportError:
+    slideio = None
+
 
 ITEMPLATE = "conda install -c conda-forge"
 
@@ -42,16 +47,19 @@ def read_image(
     input_path: Union[os.PathLike, str],
     extension: Optional[str] = None,
     key: Optional[str] = None,
-    return_original_manifest: bool = False
+    return_original_manifest: bool = False,
+    scale: Optional[Tuple[int, int]] = None,
+    image_size: Optional[Tuple[int, int]] = None,
 ) -> np.ndarray:
     """Function to read most popular biomedical imaging formats.
 
     Current supported formats:
-        - nifti format (nii, nii.gz)
-        - dicom format (dcm)
-        - metaimage header format (mha)
-        - nearly raw raster data format (nrrd, seg.nrrd)
-        - all imageio-supported formats
+        - nifti format (.nii, nii.gz)
+        - dicom format (.dcm)
+        - metaimage header format (.mha)
+        - nearly raw raster data format (.nrrd, seg.nrrd)
+        - whole-slide image data formats (.svs)
+        - all imageio-supported formats (eg. png, tif, jpg, etc.)
         - all elf-supported formats (hdf5, zarr, n5, knossos)
 
     Args:
@@ -103,6 +111,45 @@ def read_image(
             assert dicom is not None, f"Please install 'pydicom': '{ITEMPLATE} pydicom'."
             inputs = dicom.dcmread(input_path)
             input_array = inputs.pixel_array
+
+        elif suffixes[-1] == ".svs":
+            assert slideio is not None, "Please install 'slideio': 'pip install slideio'."
+            slide = slideio.open_slide(input_path)  # Fetches the slide object.
+
+            # Let's check with expected scale.
+            if scale is None:
+                scale = (0, 0)  # Loads original resolution.
+            else:
+                if not isinstance(scale, Tuple) and len(scale) != 2:
+                    raise ValueError(
+                        "The scale parameter is expected to be a tuple of height and width dimensions, "
+                        "such that the new shape is (H', W')"
+                    )
+
+            # Let's check for the expected size of the desired ROI.
+            # NOTE: Here, we expect all values for placing an ROI precisely: (y, x, H, W)
+            if image_size is None:
+                image_size = (0, 0, 0, 0)
+            else:
+                if not isinstance(image_size, Tuple):
+                    raise ValueError(
+                        "The image size parameter is expected to be a tuple of desired target ROI crop, "
+                        "such that the new crop shape is for this ROI."
+                    )
+
+                # If the user provides shapes in the usual 2d axes format, eg. (1024, 1024),
+                # we provide them a top-left corner crop.
+                if len(image_size) == 2:
+                    image_size = (0, 0, *image_size)
+
+            assert len(scale) == 2
+            assert len(image_size) == 4
+
+            # NOTE: Each slide objects contains one or multiple scenes (WSI resolution-stuff),
+            # which is coined as a continuous raster region (with the 2d image, other meta-data, etc)
+            scene = slide.get_scene(0)
+            input_array = scene.read_block(size=scale, rect=image_size)
+            inputs = scene  # We return one particular scene depending on the requested resolution.
 
         elif len(set(suffixes) - _all_imageio_formats()) == 0 or suffixes[-1] in _all_imageio_formats():
             import imageio.v3 as imageio
