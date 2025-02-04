@@ -67,6 +67,8 @@ def read_image(
         extension: The extension of the input data.
         key: The hierarchy name for container-based data structures.
         return_original_manifest: Returns the original data manifest.
+        scale: Relevant for WSIs, to get the image for a desired scale.
+        image_size: Relevant for WSIs, to get a ROI crop for a desired shape.
 
     Returns:
         The numpy array.
@@ -127,7 +129,7 @@ def read_image(
                     )
 
             # Let's check for the expected size of the desired ROI.
-            # NOTE: Here, we expect all values for placing an ROI precisely: (y, x, H, W)
+            # NOTE: Here, we expect all values for placing an ROI precisely: (x, y, W, H)
             if image_size is None:
                 image_size = (0, 0, 0, 0)
             else:
