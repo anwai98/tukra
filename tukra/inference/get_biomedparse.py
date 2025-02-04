@@ -1,4 +1,5 @@
 import os
+import warnings
 from pathlib import Path
 from typing import Union, List, Optional, Dict
 
@@ -48,7 +49,7 @@ def _load_tensor_from_input_array(input_path):
 
 
 @torch.no_grad()
-def _run_biomedparse_batched_inference(image, height, width, model, prompts):
+def _run_biomedparse_batched_inference(image, height, width, model, prompts, verbose=True):
     # The line below enables batched inference.
     batch_inputs = [
         {"image": image, "text": prompts, "height": height, "width": width}
@@ -80,7 +81,8 @@ def _run_biomedparse_batched_inference(image, height, width, model, prompts):
 
     # Binarise the predictions.
     pred_mask = (1 * (pred_mask_prob > 0.5)).astype(np.uint8)
-    print(f"Shape of predicted masks: {pred_mask.shape}")
+    if verbose:
+        print(f"Shape of predicted masks: {pred_mask.shape}")
 
     return pred_mask
 
@@ -119,6 +121,7 @@ def run_biomedparse_automatic_inference(
     model: torch.nn.Module,
     p_value_threshold: Optional[float] = None,
     batch_size: int = 1,
+    verbose: bool = True,
 ) -> Dict[str, np.ndarray]:
     """Scripts to run automatic inference for BioMedParse.
 
@@ -128,6 +131,7 @@ def run_biomedparse_automatic_inference(
         model: The model for inference.
         p_value_threshold: The p-value used to pre-filter the masks for the imaging modality.
         batch_size: The batch size for running inference.
+        verbosity: Whether to have verbosity for model outputs.
 
     Returns:
         A dictionary with semantic class and corresponding masks.
@@ -145,7 +149,7 @@ def run_biomedparse_automatic_inference(
         batch_targets = image_targets[i: i+batch_size]
 
         # Run batched inference.
-        pred_mask = _run_biomedparse_batched_inference(image, height, width, model, batch_targets)
+        pred_mask = _run_biomedparse_batched_inference(image, height, width, model, batch_targets, verbose)
 
         # Iterate through the predictions for a specific modality by prompting the model
         # for a set of masks and merge them in the following step.
@@ -159,18 +163,22 @@ def run_biomedparse_automatic_inference(
                 config_dir=os.path.join(_get_biomedparse_cachedir(), "configs"),
             )
             if p_value_threshold and adj_p_value < p_value_threshold:
-                print(f"Reject null hypothesis for {target} with p-value {adj_p_value}")
+                if verbose:
+                    print(f"Reject null hypothesis for {target} with p-value {adj_p_value}")
                 continue
 
             predicts[target] = pred_mask[j]
             p_values[target] = adj_p_value
 
     predicts = non_maxima_suppression(predicts, p_values)
-    masks = combine_masks(predicts)
 
-    return {
-        target: mask for target, mask in masks.items()
-    }
+    # It could be the case that the model predicts nothing. In this case, we return 'None'.
+    if predicts:
+        masks = combine_masks(predicts)
+        return {target: mask for target, mask in masks.items()}
+    else:
+        warnings.warn("The model did not segment anything.")
+        return None
 
 
 def _get_biomedparse_cachedir():
