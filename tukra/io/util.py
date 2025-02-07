@@ -114,7 +114,7 @@ def read_image(
             inputs = dicom.dcmread(input_path)
             input_array = inputs.pixel_array
 
-        elif suffixes[-1] == ".svs":
+        elif suffixes[-1] in [".svs", ".afi", ".zvi", ".czi", ".ndpi", ".scn", ".vsi"]:
             assert slideio is not None, "Please install 'slideio': 'pip install slideio'."
             slide = slideio.open_slide(input_path)  # Fetches the slide object.
 
