@@ -70,7 +70,8 @@ def predict_nnunetv2(
     dataset_id: str,
     dim: str,
     plans: str = "nnUNetResEncUNetLPlans",
-    fold: int = 0
+    fold: int = 0,
+    save_probabilities: bool = False,
 ):
     """Function to predict using trained nnUNet in the expected structure.
 
@@ -80,11 +81,15 @@ def predict_nnunetv2(
         dim: The nnUNet configuration (2d / 3d_fullres) to train.
         plans: The plan designed for the experiments for training nnUNet.
         fold: The fold for training nnUNet.
+        save_probabilities: Whether to store the predicted raw probabilities.
     """
     input_dir, output_dir = _get_inference_paths(dataset_name, fold)
     assert os.path.exists(input_dir), "The input folder does not exists. Please preprocess the input images first."
 
-    cmd = f"nnUNetv2_predict -i {input_dir} -o {output_dir} -d {dataset_id} -c {dim} -f {fold} -p {plans}"
+    cmd = f"nnUNetv2_predict -i {input_dir} -o {output_dir} -d {dataset_id} -c {dim} -f {fold} -p {plans} "
+    if save_probabilities:
+        cmd += "--save_probabilities"
+
     os.system(cmd)
 
 
