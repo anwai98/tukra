@@ -17,7 +17,6 @@
 ## TODO: Planned Frameworks
 - SplineDist
 - OmniPose
-- InstanSeg
 
 ## Supported Datasets:
 > Thanks to <a href="https://github.com/constantinpape/torch-em">`torch-em`</a>.
