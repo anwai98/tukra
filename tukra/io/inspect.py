@@ -6,7 +6,7 @@ import numpy as np
 from ..io import read_image
 
 
-def tukra_inspect(input_paths, keys=None):
+def tukra_inspect(input_paths, unique_ids=False, keys=None):
     """Inspects the image data located at the provided filepath.
 
     Args:
@@ -22,6 +22,8 @@ def tukra_inspect(input_paths, keys=None):
         print(f"Data type of image: '{image.dtype}'")
         print(f"Intensity range: '{np.min(image)}' to '{np.max(image)}'")
         print(f"Mean and standard deviation of intensity values: '{np.mean(image)}', '{np.std(image)}'")
+        if unique_ids:
+            print(f"Unique IDS: '{np.unique(image)}'")
         print()
 
 
@@ -39,6 +41,10 @@ def main():
         help="The key for opening data with 'elf.io.open_file'. This is the hierarchy name for a hdf5 or "
         "zarr container, for an image stack it is a wild-card, e.g. '*.png' and for mrc it is 'data'."
     )
+    parser.add_argument(
+        "-u", "--unique_ids", action="store_true",
+        help="Whether to return unique ids for the entire array under inspection."
+    )
     args = parser.parse_args()
 
     _input_paths = args.input_path
@@ -55,7 +61,7 @@ def main():
         if "*" in ipath:
             _input_paths.extend(glob(os.path.join(ipath)))
 
-    tukra_inspect(input_paths=_input_paths, keys=_keys)
+    tukra_inspect(input_paths=_input_paths, unique_ids=args.unique_ids, keys=_keys)
 
 
 if __name__ == "__main__":
