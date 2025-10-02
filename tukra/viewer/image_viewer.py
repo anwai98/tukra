@@ -28,6 +28,9 @@ def tukra_viewer(input_paths, keys=None, channels_first=False):
             assert image.ndim == 3,  "The channels first feature is supported for 3d volumes only."
             image = image.transpose(2, 0, 1)
 
+        # Remove singleton dimensions as it is.
+        image = image.squeeze()
+
         _viewer.add_image(image, name=f"Image_{idx}" if key is None else key)
 
     napari.run()

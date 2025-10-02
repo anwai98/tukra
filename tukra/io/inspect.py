@@ -15,6 +15,7 @@ def tukra_inspect(input_paths, unique_ids=False, keys=None):
     """
     for input_path, key in zip(input_paths, keys):
         image = read_image(input_path=input_path, key=key)
+        image = image.squeeze()
 
         print()
         print(f"Inspecting information about the image: '{os.path.basename(input_path)}'")
