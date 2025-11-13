@@ -4,7 +4,7 @@ from typing import Optional, List, Union, Tuple
 import numpy as np
 
 try:
-    from cellpose import denoise, models
+    from cellpose import models
     _cellpose_is_installed = True
 except ImportError:
     _cellpose_is_installed = False
@@ -18,6 +18,7 @@ MODEL_CHOICES = [
     "tissuenet",
     "nuclei",
     "livecell_cp3",
+    "cpsam",
 ]
 
 RESTORATION_CHOICES = [
@@ -46,6 +47,12 @@ def segment_using_cellpose(
         channels: The channel parameters to be used for inference.
         diameter: The diameter of the objects.
 
+    NOTE:
+    1. For CellPose-SAM:
+        a. You do not need to adjust the channels for histopathology BF images.
+        b. For fluoroscence images, cytoplasn / membrane stain becomes channel 1, next is nuclear,
+           and the third is 'None'.
+
     Returns:
         masks: The instance segmentation.
     """
@@ -63,14 +70,19 @@ def segment_using_cellpose(
 
             masks, flows, styles, diams = model.eval(image, diameter=diameter, channels=channels)
 
-        elif model_choice in ["livecell", "livecell_cp3", "tissuenet"]:  # specialist models
-            model = models.CellposeModel(gpu=use_gpu, model_type=model_choice)
+        elif model_choice in ["livecell", "livecell_cp3", "tissuenet", "cpsam"]:  # specialist models
+            kwargs = {}
+            if model_choice != "cpsam":  # Other model types need to be defined.
+                kwargs["model_type"] = model_choice
+
+            model = models.CellposeModel(gpu=use_gpu, **kwargs)
             masks, flows, styles = model.eval(image, diameter=diameter, channels=channels)
 
         else:
             raise ValueError(f"{model_choice} is not supported in 'tukra'.")
 
     else:
+        from cellpose import denoise
         assert restoration_choice in RESTORATION_CHOICES, f"{restoration_choice} is not supported in 'tukra'."
         model = denoise.CellposeDenoiseModel(
             gpu=use_gpu, model_type=model_choice, restore_type=restoration_choice,
