@@ -2,7 +2,7 @@
 
 1. CellPoseSAM:
     a. default: 0.383
-    b. finetuned:
+    b. finetuned: 0.476
 
 2. CellPose3:
     a. default:
@@ -53,6 +53,7 @@ def train_cellpose():
         save_root="./cellpose_finetuning",
         checkpoint_name="finetune_cpsam_orgasegment",
         n_epochs=10,
+        min_train_masks=2,
     )
 
     print(f"The model has been stored at '{checkpoint_path}'.")
@@ -79,7 +80,7 @@ def evaluate_cellpose(custom=None):
         assert image.ndim == 2, "For CP, I am making assumptions so I just hard-code this expectation for now."
 
         if custom:  # custom trained model.
-            masks = segment_using_custom_cellpose(image=image, checkpoint_path=custom)
+            masks = segment_using_custom_cellpose(image=image, diameter=None, channels=None, checkpoint_path=custom)
         else:  # out-of-the-box validation.
             masks = segment_using_cellpose(image=image, model_choice="cpsam")
 

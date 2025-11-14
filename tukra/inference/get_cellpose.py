@@ -95,8 +95,8 @@ def segment_using_cellpose(
 def segment_using_custom_cellpose(
     image: np.ndarray,
     checkpoint_path: Union[os.PathLike, str],
-    channels: List[int] = [0, 0],
-    diameter: Union[float, int] = 0,
+    channels: Optional[List[int]] = [0, 0],
+    diameter: Optional[Union[float, int]] = 0,
     return_flows: bool = False,
     **kwargs
 ) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray, np.ndarray]]:
@@ -119,10 +119,13 @@ def segment_using_custom_cellpose(
 
     model = models.CellposeModel(gpu=use_gpu, pretrained_model=checkpoint_path)
 
-    if diameter == 0:
-        diameter = model.diam_labels
+    if diameter and diameter == 0:
+        kwargs["diameter"] = model.diam_labels
 
-    masks, flows, styles = model.eval(image, diameter=diameter, channels=channels, **kwargs)
+    if channels:
+        kwargs["channels"] = channels
+
+    masks, flows, styles = model.eval(image, **kwargs)
 
     if return_flows:
         return masks, flows, styles

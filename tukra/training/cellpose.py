@@ -19,6 +19,7 @@ def run_cellposesam_finetuning(
     learning_rate: float = 1e-5,
     weight_decay: float = 0.1,
     batch_size: int = 1,
+    min_train_masks: int = 5,
     **kwargs
 ):
     """
@@ -35,6 +36,8 @@ def run_cellposesam_finetuning(
     # Prepare the CellPose model.
     model = models.CellposeModel(gpu=True)
 
+    os.makedirs(save_root, exist_ok=True)
+
     # Train the CellPose model.
     model_path, _, _ = train.train_seg(
         net=model.net,
@@ -48,7 +51,8 @@ def run_cellposesam_finetuning(
         learning_rate=learning_rate,
         weight_decay=weight_decay,
         model_name=checkpoint_name,
-        load_files=False,  # Whether to load files in memory.
+        load_files=True,  # Whether to load files in memory, currently broken.
+        min_train_masks=min_train_masks,
         **kwargs,
     )
 
