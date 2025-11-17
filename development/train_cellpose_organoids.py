@@ -14,6 +14,14 @@
 3. CellPose2:
     a: default: 0.294
     b. finetuned: 0.474
+
+NOTE: How to make things workout without a massive mess?
+1. CellPoseSAM - the first thing is to create a new environment and install `micro-sam`:
+    - `micromamba create -n cpsam -c conda-forge python=3.11 micro_sam`
+    - `pip install cellpose`
+2. CellPose 3 / CellPose2 - same as above, but stick to latest CellPosev3 for this:
+    - `micromamba create -n cp3 -c conda-forge python=3.11 micro_sam`
+    - `pip install "cellpose<4"`
 """
 
 
