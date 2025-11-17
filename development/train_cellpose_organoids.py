@@ -9,11 +9,11 @@
     b. w. denoiser: 0.287
     c. w. deblur: 0.256
     d. w. upsampler: 0.289
-    e. finetuned:
+    e. finetuned: 0.447
 
 3. CellPose2:
     a: default: 0.294
-    b. finetuned:
+    b. finetuned: 0.474
 """
 
 
@@ -69,7 +69,7 @@ def train_cellpose3():
     train_image_paths, train_label_paths = get_organoid_data_paths(name="orgasegment", split="train")
     val_image_paths, val_label_paths = get_organoid_data_paths(name="orgasegment", split="val")
 
-    # Train CellPose3 model.
+    # Train CellPose3 model (same backbone as CP2)
     checkpoint_path, _ = run_cellpose2_finetuning(
         train_image_files=train_image_paths,
         train_label_files=train_label_paths,
@@ -78,8 +78,9 @@ def train_cellpose3():
         save_root="./cellpose_finetuning/",
         checkpoint_name="finetune_cyto3_orgasegment",
         initial_model="cyto3",
-        n_epochs=1,
+        n_epochs=10,
     )
+    checkpoint_path = str(checkpoint_path[0])
 
     print(f"The model has been stored at '{checkpoint_path}'.")
 
@@ -100,14 +101,11 @@ def train_cellpose2():
         save_root="./cellpose_finetuning/",
         checkpoint_name="finetune_cyto2_orgasegment",
         initial_model="cyto2",
-        n_epochs=1,
+        n_epochs=10,
     )
+    checkpoint_path = str(checkpoint_path[0])
 
     print(f"The model has been stored at '{checkpoint_path}'.")
-
-    # HACK: Something is broken smh, not sure what. Doing something hacky here.
-    if isinstance(checkpoint_path, tuple):
-        checkpoint_path = checkpoint_path[0]
 
     return checkpoint_path
 
@@ -145,15 +143,15 @@ def evaluate_cellpose(model_choice, custom=None):
 
 
 def main():
-    train = False
+    train = True
     if train:
         # checkpoint_path = train_cellposesam()
-        checkpoint_path = train_cellpose3()
-        # checkpoint_path = train_cellpose2()
+        # checkpoint_path = train_cellpose3()
+        checkpoint_path = train_cellpose2()
     else:
         checkpoint_path = None
 
-    evaluate_cellpose(model_choice="cyto3", custom=checkpoint_path)  # change model_choice to 'cyto2'/'cyto3'/'cpsam'.
+    evaluate_cellpose(model_choice="cyto2", custom=checkpoint_path)  # change model_choice to 'cyto2'/'cyto3'/'cpsam'.
 
 
 if __name__ == "__main__":
