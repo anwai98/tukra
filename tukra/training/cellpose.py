@@ -59,6 +59,19 @@ def run_cellposesam_finetuning(
     return model_path
 
 
+def run_cellpose3_finetuning(
+    train_image_files: List[Union[os.PathLike, str]],
+    train_label_files: List[Union[os.PathLike, str]],
+    val_image_files: List[Union[os.PathLike, str]],
+    val_label_files: List[Union[os.PathLike, str]],
+    checkpoint_name: Optional[str] = None,
+    save_root: Optional[Union[os.PathLike, str]] = None,
+):
+    """
+    """
+    ...
+
+
 def run_cellpose2_finetuning(
     train_image_files: List[Union[os.PathLike, str]],
     train_label_files: List[Union[os.PathLike, str]],

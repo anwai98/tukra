@@ -21,8 +21,8 @@ ROOT = "/scratch/share/cidas/cca/data/orgasegment_cp"
 
 
 def finetune_orgasegment():
-    train_image_paths, train_gt_paths = orgasegment._get_data_paths(path=ROOT, split="train", download=True)
-    val_image_paths, val_gt_paths = orgasegment._get_data_paths(path=ROOT, split="val", download=False)
+    train_image_paths, train_gt_paths = orgasegment.get_orgasegment_paths(path=ROOT, split="train", download=True)
+    val_image_paths, val_gt_paths = orgasegment.get_orgasegment_paths(path=ROOT, split="val", download=False)
 
     checkpoint_path, _ = run_cellpose2_finetuning(
         train_image_files=train_image_paths,
