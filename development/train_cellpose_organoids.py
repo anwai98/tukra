@@ -1,5 +1,7 @@
 """Results (Mean Segmentation Accuracy) for OrgaSegment by running CellPose models:
 
+NOTE: Unless stated otherwise, models are trained and tested on OrgaSegment (respective splits).
+
 1. CellPoseSAM:
     a. default (evaluated on OrgaSegment-test): 0.383
     b. finetuned (trained on OrgaSegment-train and evaluated on OrgaSegment-eval, 100 epochs): 0.525
