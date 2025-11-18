@@ -8,6 +8,57 @@ except ImportError:
     _cellpose_is_installed = False
 
 
+def run_cellposesam_finetuning(
+    train_image_files: List[Union[os.PathLike, str]],
+    train_label_files: List[Union[os.PathLike, str]],
+    val_image_files: List[Union[os.PathLike, str]],
+    val_label_files: List[Union[os.PathLike, str]],
+    checkpoint_name: Optional[str] = None,
+    save_root: Optional[Union[os.PathLike, str]] = None,
+    n_epochs: int = 100,
+    learning_rate: float = 1e-5,
+    weight_decay: float = 0.1,
+    batch_size: int = 1,
+    min_train_masks: int = 5,
+    **kwargs
+):
+    """
+    """
+    assert _cellpose_is_installed, "Please install CellPose-SAM using 'pip install cellpose'."
+
+    # Run the following line to get printing of progress.
+    io.logger_setup()
+
+    # Check if your instance has GPU access.
+    if not core.use_gpu():
+        raise ImportError("No GPU access, change your runtime")
+
+    # Prepare the CellPose model.
+    model = models.CellposeModel(gpu=True)
+
+    os.makedirs(save_root, exist_ok=True)
+
+    # Train the CellPose model.
+    model_path, _, _ = train.train_seg(
+        net=model.net,
+        train_files=train_image_files,
+        train_labels_files=train_label_files,
+        test_files=val_image_files,
+        test_labels_files=val_label_files,
+        save_path=save_root,
+        batch_size=batch_size,
+        n_epochs=n_epochs,
+        learning_rate=learning_rate,
+        weight_decay=weight_decay,
+        model_name=checkpoint_name,
+        load_files=True,  # Whether to load files in memory, currently broken.
+        min_train_masks=min_train_masks,
+        **kwargs,
+    )
+
+    return model_path
+
+
 def run_cellpose2_finetuning(
     train_image_files: List[Union[os.PathLike, str]],
     train_label_files: List[Union[os.PathLike, str]],
@@ -26,7 +77,7 @@ def run_cellpose2_finetuning(
     optimizer_choice: Literal["AdamW", "SGD"] = "AdamW",
     **kwargs
 ) -> Tuple[Union[os.PathLike, str], float]:
-    """Functionality for finetuning (or training) CellPose models.
+    """Functionality for finetuning (or training) CellPose2 models.
 
     This script is inspired from: https://github.com/MouseLand/cellpose/blob/main/notebooks/run_cellpose_2.ipynb.
 

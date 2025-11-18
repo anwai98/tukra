@@ -14,15 +14,15 @@ from torch_em.data.datasets.light_microscopy import orgasegment
 
 from tukra.evaluation import evaluate_predictions
 from tukra.inference import segment_using_custom_cellpose
-from tukra.training.cellpose2 import run_cellpose2_finetuning
+from tukra.training.cellpose import run_cellpose2_finetuning
 
 
 ROOT = "/scratch/share/cidas/cca/data/orgasegment_cp"
 
 
 def finetune_orgasegment():
-    train_image_paths, train_gt_paths = orgasegment._get_data_paths(path=ROOT, split="train", download=True)
-    val_image_paths, val_gt_paths = orgasegment._get_data_paths(path=ROOT, split="val", download=False)
+    train_image_paths, train_gt_paths = orgasegment.get_orgasegment_paths(path=ROOT, split="train", download=True)
+    val_image_paths, val_gt_paths = orgasegment.get_orgasegment_paths(path=ROOT, split="val", download=False)
 
     checkpoint_path, _ = run_cellpose2_finetuning(
         train_image_files=train_image_paths,
