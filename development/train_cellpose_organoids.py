@@ -1,28 +1,27 @@
 """Results (Mean Segmentation Accuracy) for OrgaSegment by running CellPose models:
 
-NOTE: All results are for OrgaSegment, unless mentioned specifically.
-
 1. CellPoseSAM:
     a. default (evaluated on OrgaSegment-test): 0.383
     b. finetuned (trained on OrgaSegment-train and evaluated on OrgaSegment-eval, 100 epochs): 0.525
-    c. finetuned (trained on Internal-train and evaluated on OrgaSegment-test, 100 epochs):
 
-    d. default (evaluated on Internal-test): 0.254
-    e. finetuned (trained on Internal-train and evaluated on Internal-test, 100 epochs):
-    f. finetuned (trained on OrgaSegment-train and evaluated on Internal-eval, 100 epochs): 0.223
+    c. default (evaluated on Internal-test): 0.254
+    d. finetuned (trained on Internal-train and evaluated on Internal-test, 100 epochs): 0.425
+
+    e. finetuned (trained on Internal-train and evaluated on OrgaSegment-test, 100 epochs): 0.342
+    f. finetuned (trained on OrgaSegment-train and evaluated on Internal-eval, 100 epochs): 0.271
 
 2. CellPose3:
-    a. default: 0.284
-    b. w. denoiser: 0.287
-    c. w. deblur: 0.256
-    d. w. upsampler: 0.289
-    e. finetuned: 0.447
+    a. default (evaluated on OrgaSegment-test): 0.284
+    b. w. denoiser (evaluated on OrgaSegment-test): 0.287
+    c. w. deblur (evaluated on OrgaSegment-test): 0.256
+    d. w. upsampler (evaluated on OrgaSegment-test): 0.289
+    e. finetuned (trained on OrgaSegment-train and evaluated on OrgaSegment-eval, 10 epochs): 0.447
 
 3. CellPose2:
-    a: default: 0.294
-    b. finetuned: 0.474
+    a: default (evaluated on OrgaSegment-test): 0.294
+    b. finetuned (trained on OrgaSegment-train and evaluated on OrgaSegment-eval, 10 epochs): 0.474
 
-NOTE: How to make install CellPose without a massive mess?
+NOTE: How to install CellPose without a massive mess?
 1. CellPoseSAM - the first thing is to create a new environment and install `micro-sam`:
     - `micromamba create -n cpsam -c conda-forge python=3.11 micro_sam`
     - `pip install cellpose`
@@ -67,10 +66,6 @@ def get_organoid_data_paths(name, split):
         label_paths = natsorted(glob(os.path.join(base_dir, split, "masks", "*")))
 
         assert image_paths and len(image_paths) == len(label_paths)
-
-        # HACK: Just train or evaluate on first 10 images for a simple design.
-        if split == "test":
-            image_paths, label_paths = image_paths[:10], label_paths[:10]
 
     return image_paths, label_paths
 
@@ -184,8 +179,8 @@ def main():
     else:
         checkpoint_path = None
 
-    # HACK:
-    checkpoint_path = "./cellpose_finetuning/models/finetune_cpsam_internal"
+        # HACK: Just pinning down the path to test some stuff out.
+        checkpoint_path = "./cellpose_finetuning/models/finetune_cpsam_orgasegment"
 
     # NOTE: Change the `model_choice` to 'cyto2' / 'cyto3' / 'cpsam'.
     evaluate_cellpose(model_choice="cpsam", data_name="internal", custom=checkpoint_path)
