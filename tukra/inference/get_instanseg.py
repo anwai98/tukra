@@ -37,10 +37,10 @@ def segment_using_instanseg(
 
     if image.ndim == 2:  # InstanSeg does not accept one channel images. Convert to RGB-style to avoid param mismatch.
         image = np.stack([image] * 3, axis=-1)
-    
+
     bioimageio_path = os.environ.get("INSTANSEG_BIOIMAGEIO_PATH")
     if bioimageio_path:
-        model_type = torch.jit.load(os.path.join(bioimageio_path, model_type, "instanseg.pt"))
+        model_type = torch.jit.load(os.path.join(bioimageio_path, model_type, "0.1.0", "instanseg.pt"))
 
     model = InstanSeg(model_type=model_type, verbosity=(1 if verbosity else 0))
 
